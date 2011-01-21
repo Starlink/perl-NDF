@@ -23,6 +23,8 @@ extern "C" {
 }
 #endif
 
+#include "ppport.h"
+
 /* C interface to NDF */
 #include "ndf.h"
 #include "f77.h"
