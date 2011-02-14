@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for accessing Starlink N-dimensional data structures (NDFs)'
+author:
+  - "Module created by T. Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>\n(with help from F. Economou, E<lt>frossie@jach.hawaii.eduE<gt>)"
+build_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::F77: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NDF
+provides:
+  NDF:
+    file: lib/NDF.pm
+    version: 1.49
+  NdgProvenancePtr:
+    file: lib/NDF.pm
+  PDL::IO::NDF:
+    file: lib/PDL/IO/NDF.pm
+    version: 1.02
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: git://starlink.jach.hawaii.edu/perl-NDF.git
+version: 1.49

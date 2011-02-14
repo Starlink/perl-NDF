@@ -60,22 +60,10 @@ Building and Installation
 
 3) Installation should now be a case of:
 
-	% perl Makefile.PL
-	% make
-	% make test
-	% make install
-
-to build a shareable module, or
-
-        % perl Makefile.PL
-        % make ndfperl
-        % make test_static
-        % make -f Makefile.aperl inst_perl MAP_TARGET=ndfperl
-
-to build the ndfperl binary. You will probably have to copy
-NDF.pm into your perl module area manually for the static install
-(this is usually /usr/local/lib/perl5/site_perl).
-
+	% perl Build.PL
+	% ./Build
+	% ./Build test
+	% ./Build install
 
 Using the array packing code
 ----------------------------
@@ -97,11 +85,11 @@ NDF.xs.
 Copyright
 ---------
 
-This module is copyright (C) 1996 Tim Jenness.  All rights reserved.
+This module is copyright (C) 1996-2011 Tim Jenness.  All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-The NDF module itself is copyrighted by the Starlink Project, RAL.
+The NDF library itself is copyrighted by the Starlink Project, RAL.
 
 The array handling code (arrays.c) and the ExtUtils::F77 module were
 written by Karl Glazebrook (kgb@aaoepp.aao.gov.au).

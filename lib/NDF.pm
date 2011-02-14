@@ -8,14 +8,10 @@ use vars qw($VERSION @ISA %EXPORT_TAGS);
 
 #grep "dat_.*(" NDF.xs | grep -v ';' | awk -F'(' '{print $1}' | grep -v '_r$' | sort | fmt -50
 
-require Exporter;
-require DynaLoader;
+use Exporter 'import';
+use base qw/ DynaLoader /;
 
-@ISA = qw(Exporter DynaLoader);
-
-# Version derived from CVS repository:  '$Revision$ '
-
-$VERSION = '1.49';
+$VERSION = '1.50';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -1290,7 +1286,7 @@ Module created by T. Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) Science and Technology Facilities Council.
+Copyright (C) 2009-2011 Science and Technology Facilities Council.
 Copyright (C) 1996-2007 Tim Jenness, Frossie Economou and the
 UK Particle Physics and Astronomy Research Council.
 All Rights Reserved.

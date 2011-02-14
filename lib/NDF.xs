@@ -42,11 +42,10 @@ extern "C" {
 /* The array handling code can be included here */
 /* Deal with the packing of perl arrays to C pointers */
 
-#include "arrays/arrays.h"
+#include "arrays.h"
 
-/* comment this out if you are linking with libarrays.a separately */
-#include "arrays/arrays.c"
-
+/* Support code */
+#include "ndf_getarg.h"
 
 /* Starlink parameters - the only necessary include files are sae_par.h
    and dat_par.h. The remaining include files are optional. */
@@ -59,7 +58,6 @@ extern "C" {
 #include "ems_err.h"
 #include "msg_par.h"
 #include "ndf.h"
-
 
 /* Include BAD values */
 #include "prm_par.h"
@@ -107,12 +105,6 @@ void MAIN__ () {
    /* Cheat to define MAIN__ symbol */
    croak("This should never happen");
 }
-
-/* Copy perl's ARGV variable into argc/argv as used by NDF and CNF
-   to initialise the Fortran runtime. */
-
-#include "getarg.c"
-
 
 /* Should use the C interface */
 
@@ -303,7 +295,7 @@ AstObject * AV_to_ast( AV* textarray, int *status ) {
   return obj;
 }
 
-#include "const-c.inc"
+#include "../const-c.inc"
 
 MODULE = NDF    PACKAGE = NDF
 
@@ -319,7 +311,7 @@ BOOT:
    ndfInit( pargc, pargv, &arg_status );
 
 
-INCLUDE: const-xs.inc
+INCLUDE: ../const-xs.inc
 
 # Locator constants
 

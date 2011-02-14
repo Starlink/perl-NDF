@@ -1,3 +1,17 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "EXTERN.h"   /* std perl include */
+#include "perl.h"     /* std perl include */
+#include "XSUB.h"     /* XSUB include */
+#ifdef __cplusplus
+}
+#endif
+
+#include "ppport.h"
+
+#include "ndf_getarg.h"
+
 void perl2argv( int * argc, char **outargv[])
 {
 /*
@@ -32,6 +46,8 @@ void perl2argv( int * argc, char **outargv[])
    History:
      20-SEP-2005 (TimJ):
        Original version
+     2011-02-14 (TIMJ):
+       Add include file with prototypes
 
    */
 
