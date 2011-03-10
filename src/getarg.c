@@ -101,8 +101,9 @@ void perl2argv( int * argc, char **outargv[])
     New( 0, element, nchars+1, char );
     if ( perl_string != NULL ) {
       strncpy(element, perl_string, nchars );
+      element[nchars] = '\0';
     } else {
-      element = '\0';
+      element[0] = '\0';
     }
     args[i] = element;
   }
