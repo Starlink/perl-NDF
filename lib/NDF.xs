@@ -246,7 +246,7 @@ static void astsink(  void (*sink)(const char *), const char *line, int *status 
 SV* _ast_to_SV( AstObject * obj, int *status ) {
   int *old_ast_status;
   int ast_status = SAI__OK;
-  SV * buffer;
+  SV * buffer = NULL;
   AstChannel *chan;
 
   /* An SV to hold the output buffer */
@@ -2006,10 +2006,10 @@ ndfGtwcs_(indf, status)
  PREINIT:
   AstFrameSet * iwcs;
  CODE:
-  /* Read the framset */
+  /* Read the frameset */
   ndfGtwcs(indf, &iwcs, &status);
   RETVAL = _ast_to_SV( (AstObject*)iwcs, &status );
-  iwcs = astAnnul( iwcs );
+  if (iwcs) iwcs = astAnnul( iwcs );
  OUTPUT:
   RETVAL
   status
@@ -2025,7 +2025,7 @@ ndfPtwcs_(wcsarr, indf, status)
  CODE:
   iwcs = (AstFrameSet*)AV_to_ast( wcsarr, &status );
   ndfPtwcs(iwcs, indf, &status);
-  iwcs = astAnnul( iwcs );
+  if (iwcs) iwcs = astAnnul( iwcs );
  OUTPUT:
   status
 
@@ -4804,7 +4804,7 @@ ndgGetProv_( prov, ianc, status )
  CODE:
   km = ndgGetProv( prov, ianc, NULL, &status );
   RETVAL = _ast_to_SV( (AstObject*)km, &status );
-  astAnnul( km ); /* no longer needed */
+  if (km) astAnnul( km ); /* no longer needed */
  OUTPUT:
   RETVAL
   status
@@ -4824,7 +4824,7 @@ ndgModifyProv_( prov, ianc, akm, status )
  CODE:
   km = (AstKeyMap*)AV_to_ast( akm, &status );
   ndgModifyProv( prov, ianc, km, NULL, &status );
-  km = astAnnul( km );
+  if (km) km = astAnnul( km );
  OUTPUT:
   status
 
