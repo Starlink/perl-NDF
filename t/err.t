@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 use strict;
 
 use_ok( "NDF" );
@@ -24,6 +24,14 @@ err_begin($status);
 $status = &NDF::SAI__ERROR;
 err_rep("","An artificial error", $status);
 err_annul($status);
+is($status, $good, "Check status");
+
+# Check flush
+$status = &NDF::SAI__ERROR;
+err_rep("","An artificial error", $status);
+err_rep("","Error two", $status);
+my @errmsg = &NDF::err_flush_to_string( $status );
+is(scalar @errmsg, 2, "Count flushed messages");
 is($status, $good, "Check status");
 
 
