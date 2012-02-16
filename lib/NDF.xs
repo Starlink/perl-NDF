@@ -671,8 +671,6 @@ ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
     unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, ndim);
   }
  OUTPUT:
-  lbnd
-  ubnd
   ndim
   status
 
@@ -829,7 +827,6 @@ ndf_dim(indf, ndimx, dim, ndim, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
-#  dim
   ndim
   status
 
@@ -2345,7 +2342,6 @@ dat_get1d(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
-  value
   el
   status
 
@@ -2364,7 +2360,6 @@ dat_get1i(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
-  value
   el
   status
 
@@ -2383,7 +2378,6 @@ dat_get1r(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
-  value
   el
   status
 
@@ -2429,7 +2423,6 @@ dat_getvd(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
-  value
   el
   status
 
@@ -2448,7 +2441,6 @@ dat_getvi(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
-  value
   el
   status
 
@@ -2467,7 +2459,6 @@ dat_getvr(loc, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3171,7 +3162,6 @@ dat_shape(loc, ndimx, dim, ndim, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
-  dim
   ndim
   status
 
@@ -3443,7 +3433,6 @@ cmp_get1d(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3463,7 +3452,6 @@ cmp_get1i(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3483,7 +3471,6 @@ cmp_get1r(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKF, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3532,7 +3519,6 @@ cmp_getvd(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3552,7 +3538,6 @@ cmp_getvi(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
  OUTPUT:
-  value
   el
   status
 
@@ -3572,7 +3557,6 @@ cmp_getvr(loc, name, elx, value, el, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, 'r', el);
  OUTPUT:
-  value
   el
   status
 
@@ -3848,7 +3832,6 @@ cmp_shape(loc, name, ndimx, dim, ndim, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
  OUTPUT:
-  dim
   ndim
   status
 
@@ -4155,7 +4138,6 @@ ary_dim(iary, ndimx, dim, ndim, status)
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
-  dim
   ndim
   status
 
