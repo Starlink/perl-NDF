@@ -5,5 +5,5 @@ _build
 lib/NDF.c
 const-c.inc
 const-xs.inc
-MYMETA.yml
+MYMETA.*
 NDF-*.tar.gz
