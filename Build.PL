@@ -95,7 +95,10 @@ my $build = Module::Build->new
                       "Test::Number::Delta" => 0,
                       "ExtUtils::F77" => 0,
                      },
-   c_source => [ "src" ],
+   c_source => "src",
+   configure_requires => {
+                          "Module::Build" => '0.20',
+                         },
    extra_compiler_flags => [ "-I$StarConfig{Star_Inc}", ( $cnf_defines ? $cnf_defines : ()) ],
    extra_linker_flags =>  "-L$StarConfig{Star_Lib} $ndflibs $fortranlibs",
   );
