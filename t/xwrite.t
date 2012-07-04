@@ -3,6 +3,7 @@
 use Test::More tests => 27;
 use warnings;
 use strict;
+use Test::Number::Delta;
 
 use_ok( "NDF" );
 
@@ -109,7 +110,7 @@ err_end($status);
 is( $cval, $cinval, "Compare CHAR");
 is( $lval, $linval, "Compare LOGICAL");
 is( $ival, $iinval, "Compare INTEGER");
-is( $dval, $dinval, "Compare DOUBLE");
+delta_ok( $dval, $dinval, "Compare DOUBLE");
 
 # deal with rounding
 is( sprintf("%.1f", $rval), $rinval, "Compare REAL");

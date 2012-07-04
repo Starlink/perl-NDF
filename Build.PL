@@ -92,6 +92,7 @@ my $build = Module::Build->new
                 },
    build_requires => {
                       "Test::More" => 0,
+                      "Test::Number::Delta" => 0,
                       "ExtUtils::F77" => 0,
                      },
    c_source => [ "src" ],
