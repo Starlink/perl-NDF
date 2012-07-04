@@ -3575,19 +3575,22 @@ cmp_len(loc, name, len, status)
   status
 
 void
-cmp_mapv(loc, name, type, mode, pntr, el, status)
+cmp_mapv(loc, name, type, mode, cpntr, el, status)
   locator * loc
   char * name
   char * type
   char * mode
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &el   = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$$
+ PREINIT:
+  int fpntr;
  CODE:
-  cmp_mapv_(loc, name, type, mode, &pntr, &el, &status, DAT__SZLOC, strlen(name), strlen(type), strlen(mode));
+  cmp_mapv_(loc, name, type, mode, &fpntr, &el, &status, DAT__SZLOC, strlen(name), strlen(type), strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   el
   status
 
