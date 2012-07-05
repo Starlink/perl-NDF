@@ -11,7 +11,7 @@ use vars qw($VERSION @ISA %EXPORT_TAGS);
 use Exporter 'import';
 use base qw/ DynaLoader /;
 
-$VERSION = '1.51';
+$VERSION = '1.52';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
