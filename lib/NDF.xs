@@ -156,6 +156,7 @@ int  arg_status = SAI__OK;
 /* Internally convert an f77 string to C - must be at least 1 byte long */
 /* Could use cnf here */
 
+void
 stringf77toC (char*c, int len) {
    int i;
 
@@ -184,6 +185,7 @@ stringf77toC (char*c, int len) {
 /* Internally convert an C string to f77 - must be at least 1 byte long */
 /* Could use cnf here */
 
+void
 stringCtof77 (char*c, int len) {
 
    int i;
@@ -260,7 +262,7 @@ SV* _ast_to_SV( AstObject * obj, int *status ) {
     chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer,
                           astsink,"" );
     astWrite( chan, obj );
-    astAnnul( chan );
+    chan = astAnnul( chan );
     if (!astOK) {
       *status = SAI__ERROR;
       errRep( "AST_ERR", "Error converting the FrameSet into string form",
@@ -4789,7 +4791,7 @@ ndgGetProv_( prov, ianc, status )
  CODE:
   km = ndgGetProv( prov, ianc, NULL, &status );
   RETVAL = _ast_to_SV( (AstObject*)km, &status );
-  if (km) astAnnul( km ); /* no longer needed */
+  if (km) km = astAnnul( km ); /* no longer needed */
  OUTPUT:
   RETVAL
   status
