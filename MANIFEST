@@ -6,7 +6,6 @@ README
 README.solaris
 README.linux
 README.dec_osf
-README.pdl
 INSTALL
 ChangeLog
 src/getarg.c
