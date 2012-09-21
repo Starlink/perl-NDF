@@ -4789,7 +4789,7 @@ ndgGetProv_( prov, ianc, status )
  PREINIT:
   AstKeyMap *km = NULL;
  CODE:
-  km = ndgGetProv( prov, ianc, NULL, &status );
+  km = ndgGetProv( prov, ianc, &status );
   RETVAL = _ast_to_SV( (AstObject*)km, &status );
   if (km) km = astAnnul( km ); /* no longer needed */
  OUTPUT:
@@ -4810,7 +4810,7 @@ ndgModifyProv_( prov, ianc, akm, status )
    AstKeyMap *km = NULL;
  CODE:
   km = (AstKeyMap*)AV_to_ast( akm, &status );
-  ndgModifyProv( prov, ianc, km, NULL, &status );
+  ndgModifyProv( prov, ianc, km, &status );
   if (km) km = astAnnul( km );
  OUTPUT:
   status
