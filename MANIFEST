@@ -2,7 +2,6 @@ MANIFEST
 Build.PL
 lib/NDF.pm
 lib/NDF.xs
-lib/PDL/IO/NDF.pm
 README
 README.solaris
 README.linux
