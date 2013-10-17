@@ -100,7 +100,7 @@ my $build = Module::Build->new
                           "Module::Build" => '0.20',
                          },
    extra_compiler_flags => [ "-I$StarConfig{Star_Inc}", ( $cnf_defines ? $cnf_defines : ()) ],
-   extra_linker_flags =>  "-L$StarConfig{Star_Lib} $ndflibs $fortranlibs",
+   extra_linker_flags => "-L$StarConfig{Star_Lib} -Wl,-rpath,$StarConfig{Star_Lib} $ndflibs $fortranlibs",
   );
 
 $build->create_build_script;
