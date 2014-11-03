@@ -98,6 +98,7 @@ my $build = Module::Build->new
    c_source => "src",
    configure_requires => {
                           "Module::Build" => '0.20',
+                          "ExtUtils::F77" => 0,
                          },
    extra_compiler_flags => [ "-I$StarConfig{Star_Inc}", ( $cnf_defines ? $cnf_defines : ()) ],
    extra_linker_flags => "-L$StarConfig{Star_Lib} -Wl,-rpath,$StarConfig{Star_Lib} $ndflibs $fortranlibs",
