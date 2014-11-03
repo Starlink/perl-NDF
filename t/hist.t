@@ -27,44 +27,43 @@ ndf_happn("Perl test", $status);
 
 # Copy the reference file for testing purposes
 ndf_place( &NDF::DAT__ROOT, $file, my $place, $status );
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_place status");
 ndf_find( &NDF::DAT__ROOT, $oldfile, my $oldndf, $status );
 ndf_copy($oldndf, $place, my $indf, $status );
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_copy status");
 
 ndf_hcre($indf, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hcre status");
 ndf_hnrec($indf, my $nnrec, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hnrec status");
 print "# Number of records: $nnrec\n";
 
 my @date = (1996, 8, 8, 20, 00);
 ndf_hfind($indf, \@date, 0.0, 0, my $irec, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hfind status");
 print "# Record is $irec\n";
 ndf_hdef($indf,' ',$status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hdef status");
 
 my @text = ("This is a test of history. (Last word should be HI)",
 	    "Text should be formatted.", "HI");
 ndf_hput('NORMAL', '',0, 3, \@text, 1, 1, 1, $indf, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hput status");
 ndf_hend($status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hend status");
 
 ndf_hnrec($indf, my $nrec, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hnrec status");
 ndf_hout($indf, $nrec, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_hout status");
 ndf_hinfo($indf, 'APPLICATION', $nrec, my $val, $status);
-is( $status, &NDF::SAI__OK, "check status");
-
+is( $status, &NDF::SAI__OK, "ndf_hinfo status");
 ndf_delet($indf, $status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_delet status");
 ok( !-e "$file.sdf", "File no longer exists");
 
 ndf_end($status);
-is( $status, &NDF::SAI__OK, "check status");
+is( $status, &NDF::SAI__OK, "ndf_end status");
 err_end($status);
 
 is(($nrec-$nnrec),1,"Test hist diff");
