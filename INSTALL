@@ -27,11 +27,6 @@ Luckily Starlink distribute ALL necessary libraries in one package if
 the NDF library is requested. Pre-built libraries can be obtained for
 Alpha/OSF1, Linux and Sun Solaris.
 
-Since the libraries are in Fortran a Fortran library is also necessary.
-I use the ExtUtils::F77 module to determine which Fortran libraries
-to use. (I have distributed this with the module for ease of use. The 
-F77 module was written by Karl Glazebrook).
-
 If you wish to use the PDL::NDF extension you will also need PDL,
 available from CPAN. The PDL module works with version 1.11 of Perl DL.
 
@@ -91,5 +86,5 @@ modify it under the same terms as Perl itself.
 
 The NDF library itself is copyrighted by the Starlink Project, RAL.
 
-The array handling code (arrays.c) and the ExtUtils::F77 module were
+The array handling code (arrays.c) was
 written by Karl Glazebrook (kgb@aaoepp.aao.gov.au).

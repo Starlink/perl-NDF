@@ -27,7 +27,6 @@ extern "C" {
 
 /* C interface to NDF */
 #include "ndf.h"
-#include "f77.h"
 
 /* For AST object creation */
 #include "ast.h"
@@ -43,9 +42,6 @@ extern "C" {
 /* Deal with the packing of perl arrays to C pointers */
 
 #include "arrays.h"
-
-/* Support code */
-#include "ndf_getarg.h"
 
 /* Starlink parameters - the only necessary include files are sae_par.h
    and dat_par.h. The remaining include files are optional. */
@@ -140,12 +136,6 @@ typedef char locator;
    as they are used in the typemaps */
 static STRLEN  datszloc = DAT__SZLOC;
 static locator datroot[DAT__SZLOC]  = DAT__ROOT;
-
-/* Variables used in the BOOT section */
-/* pargv can not be free since ndfInit does not copy the argument */
-static char **pargv = NULL;
-static int  pargc = 0;
-int  arg_status = SAI__OK;
 
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
@@ -300,18 +290,6 @@ AstObject * AV_to_ast( AV* textarray, int *status ) {
 #include "../const-c.inc"
 
 MODULE = NDF    PACKAGE = NDF
-
-BOOT:
-   /* We need to initialise the fortran run time and NDF
-       First though we need to get the perl arguments, which
-       can not be freed until ndf has shut down.
-   */
-   perl2argv( &pargc, &pargv );
-#ifndef HAVE_OLD_CNF
-   cnfInitRTL(pargc, pargv);
-#endif
-   ndfInit( pargc, pargv, &arg_status );
-
 
 INCLUDE: ../const-xs.inc
 
