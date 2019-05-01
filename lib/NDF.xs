@@ -2056,11 +2056,10 @@ dat_cctyp(size, type)
   char * type = NO_INIT
  PROTOTYPE: $$
  PREINIT:
-   char str1[FCHAR];
+   char str1[DAT__SZTYP+1];
  CODE:
   type = str1;
-  dat_cctyp_(&size, type, sizeof(str1));
-  stringf77toC(type, sizeof(str1));
+  datCctyp(size, type);
  OUTPUT:
   type
 
@@ -2144,14 +2143,10 @@ dat_drep(loc, format, order, status)
   ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
-   char str1[FCHAR];
-   char str2[FCHAR];
+  HDSLoc * loc_c = 0;
  CODE:
-  format = str1;
-  order = str2;
-  dat_drep_(loc, format, order, &status, DAT__SZLOC, sizeof(str1), sizeof(str2));
-  stringf77toC(format, sizeof(str1));
-  stringf77toC(order, sizeof(str2));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datDrep(loc_c, &format, &order, &status);
  OUTPUT:
   format
   order
@@ -2172,15 +2167,14 @@ dat_erase(loc, name, status)
 void
 dat_ermsg(status, length, msg)
   ndfint &status
-  ndfint &length = NO_INIT
+  size_t &length = NO_INIT
   char * msg = NO_INIT
  PROTOTYPE: $$$
  PREINIT:
    char str1[FCHAR];
  CODE:
   msg = str1;
-  dat_ermsg_(&status, &length, msg, sizeof(str1));
-  stringf77toC(msg, sizeof(str1));
+  datErmsg(status, &length, msg);
  OUTPUT:
   length
   msg
@@ -2209,10 +2203,11 @@ dat_get0c(loc, value, status)
  PROTOTYPE: $$$
  PREINIT:
    char str1[FCHAR];
+   HDSLoc * loc_c = 0;
  CODE:
   value = str1;
-  dat_get0c_(loc, value, &status, DAT__SZLOC, sizeof(str1));
-  stringf77toC(value, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datGet0C(loc_c, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
@@ -2271,24 +2266,29 @@ dat_get1c(loc, elx, value, el, status)
   locator * loc
   ndfint &elx
   char * value = NO_INIT
-  ndfint &el = NO_INIT
+  size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
  PREINIT:
   ndfint i;
+  HDSLoc * loc_c = 0;
+  char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char);
-  dat_get1c_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
+  Newx( pntrs, elx, char* );
+
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datGet1C(loc_c, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
     /* Write to perl character array */
     for (i = 0; i<el; i++) {
-      stringf77toC(value+i*FCHAR,FCHAR);
-      av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+      av_store( (AV*) SvRV(ST(2)), i, newSVpv(pntrs[i], strlen(pntrs[i])));
     }
   }
   Safefree(value); /* Hose */
+  Safefree(pntrs);
  OUTPUT:
   status
   el
@@ -2352,24 +2352,29 @@ dat_getvc(loc, elx, value, el, status)
   locator * loc
   ndfint &elx
   char * value = NO_INIT
-  ndfint &el = NO_INIT
+  size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
  PREINIT:
   ndfint i;
+  HDSLoc * loc_c = 0;
+  char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char );
-  dat_getvc_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
+  Newx( pntrs, elx, char* );
+
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datGetVC(loc_c, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
     /* Write to perl character array */
     for (i = 0; i<el; i++) {
-      stringf77toC(value+i*FCHAR,FCHAR);
-      av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+      av_store( (AV*) SvRV(ST(2)), i, newSVpv(pntrs[i], strlen(pntrs[i])));
     }
   }
   Safefree(value); /* Hose */
+  Safefree(pntrs);
  OUTPUT:
   el
   status
@@ -2625,11 +2630,12 @@ dat_name(loc, name, status)
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
-   char str1[FCHAR];
+   char str1[DAT__SZNAM+1];
+   HDSLoc * loc_c = 0;
  CODE:
   name = str1;
-  dat_name_(loc, name, &status, DAT__SZLOC, sizeof(str1));
-  stringf77toC(name, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datName(loc_c, name, &status);
  OUTPUT:
   name
   status
@@ -3060,10 +3066,12 @@ dat_ref(loc, ref, lref, status)
  PROTOTYPE: $$$$
  PREINIT:
    char str1[FCHAR];
+   HDSLoc * loc_c = 0;
  CODE:
   ref = str1;
-  dat_ref_(loc, ref, &lref, &status, DAT__SZLOC, sizeof(str1));
-  stringf77toC(ref, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datRef(loc_c, ref, sizeof(str1), &status);
+  lref = strlen(ref);
  OUTPUT:
   ref
   lref
@@ -3222,11 +3230,12 @@ dat_type(loc, type, status)
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
-   char str1[FCHAR];
+   char str1[DAT__SZTYP+1];
+   HDSLoc * loc_c = 0;
  CODE:
   type = str1;
-  dat_type_(loc, type, &status, DAT__SZLOC, sizeof(str1));
-  stringf77toC(type, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datType(loc_c, type, &status);
  OUTPUT:
   type
   status
@@ -3295,10 +3304,11 @@ cmp_get0c(loc, name, value, status)
  PROTOTYPE: $$$$
  PREINIT:
    char str1[FCHAR];
+   HDSLoc * loc_c = 0;
  CODE:
   value = str1;
-  cmp_get0c_(loc, name, value, &status, DAT__SZLOC, strlen(name), sizeof(str1));
-  stringf77toC(value, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpGet0C(loc_c, name, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
@@ -3838,11 +3848,12 @@ cmp_type(loc, name, type, status)
   ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
-   char str1[FCHAR];
+   char str1[DAT__SZTYP + 1];
+   HDSLoc * loc_c = 0;
  CODE:
   type = str1;
-  cmp_type_(loc, name, type, &status, DAT__SZLOC, strlen(name), sizeof(str1));
-  stringf77toC(type, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpType(loc_c, name, str1, &status);
  OUTPUT:
   type
   status
@@ -3920,11 +3931,12 @@ hds_group(loc, group, status)
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
-   char str1[FCHAR];
+   char str1[DAT__SZGRP + 1];
+   HDSLoc * loc_c = 0;
  CODE:
   group = str1;
-  hds_group_(loc, group, &status, DAT__SZLOC, sizeof(str1));
-  stringf77toC(group, sizeof(str1));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  hdsGroup(loc_c, group, &status);
  OUTPUT:
   group
   status
@@ -4039,12 +4051,12 @@ hds_trace(loc, nlev, path, file, status)
  PREINIT:
    char str1[FCHAR];
    char str2[FCHAR];
+   HDSLoc * loc_c = 0;
  CODE:
   path = str1;
   file = str2;
-  hds_trace_(loc, &nlev, path, file, &status, DAT__SZLOC, sizeof(str1), sizeof(str2));
-  stringf77toC(path, sizeof(str1));
-  stringf77toC(file, sizeof(str2));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  hdsTrace(loc_c, &nlev, path, file, &status, sizeof(str1), sizeof(str2));
  OUTPUT:
   nlev
   path
