@@ -3948,7 +3948,7 @@ hds_link(loc, group, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  hds_link_(loc, group, &status, DAT__SZLOC);
+  hds_link_(loc, group, &status, DAT__SZLOC, strlen(group));
  OUTPUT:
   status
 
