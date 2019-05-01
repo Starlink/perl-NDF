@@ -387,8 +387,7 @@ ndf_acget(indf, comp, iaxis, value, status)
  CODE:
    strncpy(str1, value, sizeof(str1));/* Copy value to temp */
    value = str1;
-   ndf_acget_(&indf, comp, &iaxis, value, &status, strlen(comp), sizeof(str1));
-   stringf77toC(value, sizeof(str1));
+   ndfAcget(indf, comp, iaxis, value, sizeof(str1), &status);
  OUTPUT:
    value
    status
@@ -455,8 +454,7 @@ ndf_aform(indf, comp, iaxis, form, status)
    char str1[FCHAR];
  CODE:
    form = str1;
-   ndf_aform_(&indf, comp, &iaxis, form, strlen(comp), sizeof(str1));
-   stringf77toC(form, sizeof(str1));
+   ndfAform(indf, comp, iaxis, form, sizeof(str1), &status);
  OUTPUT:
    form
    status
@@ -573,8 +571,7 @@ ndf_atype(indf, comp, iaxis, type, status)
    char str1[FCHAR];
  CODE:
    type = str1;
-   ndf_atype_(&indf, comp, &iaxis, type, &status, strlen(comp), sizeof(str1));
-   stringf77toC(type, sizeof(str1));
+   ndfAtype(indf, comp, iaxis, type, sizeof(str1), &status);
  OUTPUT:
    type
    status
@@ -666,8 +663,7 @@ ndf_cget(indf, comp, value, status)
  CODE:
    strncpy(str1, value, sizeof(str1));
    value = str1;
-   ndf_cget_(&indf, comp, value, &status, strlen(comp), sizeof(str1));
-   stringf77toC(value, sizeof(str1));
+   ndfCget(indf, comp, value, sizeof(str1), &status);
  OUTPUT:
    value
    status
@@ -834,8 +830,7 @@ ndf_form(indf, comp, form, status)
    char str1[FCHAR];
  CODE:
    form = str1;
-   ndf_form_(&indf, comp, form, &status, strlen(comp), sizeof(str1));
-   stringf77toC(form, sizeof(str1));
+   ndfForm(indf, comp, form, sizeof(str1), &status);
  OUTPUT:
    form
    status
@@ -851,8 +846,7 @@ ndf_ftype(indf, comp, ftype, status)
    char str1[FCHAR];
  CODE:
    ftype = str1;
-   ndf_ftype_(&indf, comp, ftype, &status, strlen(comp), sizeof(str1));
-   stringf77toC(ftype, sizeof(str1));
+   ndfFtype(indf, comp, ftype, sizeof(str1), &status);
  OUTPUT:
    ftype
    status
@@ -1030,9 +1024,7 @@ ndf_mtype(typlst, indf1, indf2, comp, itype, dtype, status)
  CODE:
   itype = str1;
   dtype = str2;
-  ndf_mtype_(typlst, &indf1, &indf2, comp, itype, dtype, &status, strlen(typlst), strlen(comp), sizeof(str1), sizeof(str2));
-  stringf77toC(itype, sizeof(str1));
-  stringf77toC(dtype, sizeof(str2));
+  ndfMtype(typlst, indf1, indf2, comp, itype, sizeof(str1), dtype, sizeof(str2), &status);
  OUTPUT:
   itype
   dtype
@@ -1054,9 +1046,7 @@ ndf_mtypn(typlst, n, ndfs, comp, itype, dtype, status)
  CODE:
   itype = str1;
   dtype = str2;
-  ndf_mtypn_(typlst, &n, ndfs, comp, itype, dtype, &status, strlen(typlst), strlen(comp), sizeof(str1), sizeof(str2));
-  stringf77toC(itype, sizeof(str1));
-  stringf77toC(dtype, sizeof(str2));
+  ndfMtypn(typlst, n, ndfs, comp, itype, sizeof(str1), dtype, sizeof(str2), &status);
  OUTPUT:
   itype
   dtype
@@ -1322,8 +1312,7 @@ ndf_type(indf, comp, type, status)
    char str1[FCHAR];
  CODE:
   type = str1;
-  ndf_type_(&indf, comp, type, &status, strlen(comp), sizeof(str1));
-  stringf77toC(type, sizeof(str1));
+  ndfType(indf, comp, type, sizeof(str1), &status);
  OUTPUT:
   type
   status
@@ -1561,8 +1550,7 @@ ndf_xgt0c(indf, xname, cmpt, value, status)
   /* Copy string across so that it can be returned unchanged if error */
   strncpy(str1, value, sizeof(str1));
   value = str1;
-  ndf_xgt0c_(&indf, xname, cmpt, value, &status, strlen(xname), strlen(cmpt), sizeof(str1));
-  stringf77toC(value,sizeof(str1));
+  ndfXgt0c(indf, xname, cmpt, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
@@ -1671,8 +1659,7 @@ ndf_xname(indf, n, xname, status)
    char str1[FCHAR];
  CODE:
   xname = str1;
-  ndf_xname_(&indf, &n, xname, &status, sizeof(str1));
-  stringf77toC(xname, sizeof(str1));
+  ndfXname(indf, n, xname, sizeof(str1), &status);
  OUTPUT:
   xname
   status
@@ -1859,8 +1846,7 @@ ndf_hinfo(indf, item, irec, value, status)
    char str1[FCHAR];
  CODE:
   value = str1;
-  ndf_hinfo_(&indf, item, &irec, value, &status, strlen(item), sizeof(str1));
-  stringf77toC(value, sizeof(str1));
+  ndfHinfo(indf, item, irec, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
