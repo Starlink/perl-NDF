@@ -140,56 +140,6 @@ static locator datroot[DAT__SZLOC]  = DAT__ROOT;
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
 
-/* f77<>C string conversion routines - must be passed string
-   and size (i.e. number of bytes allocated to it in storage)  */
-
-/* Internally convert an f77 string to C - must be at least 1 byte long */
-/* Could use cnf here */
-
-void
-stringf77toC (char*c, int len) {
-   int i;
-
-   if (len==0) {return;} /* Do nothing */
-
-   /* Remove all spurious \0 characters */
-   i = 0;
-
-   while(i<len-1) {
-     if(*(c+i) == '\0') { *(c+i) = ' ';}
-     i++;
-   }
-
-   /* Find end of string */
-   i = len;
-
-   while((*(c+i-1)==' '||*(c+i-1)=='\0') && i>=0){
-       i--;
-   }
-   if (i<0)       {i=0;}
-   if (i==len) {i--;}
-   /* And NULL it */;
-   *(c+i) = '\0';
-}
-
-/* Internally convert an C string to f77 - must be at least 1 byte long */
-/* Could use cnf here */
-
-void
-stringCtof77 (char*c, int len) {
-
-   int i;
-
-   i = (int) strlen(c);     /* Position of NULL character */
-
-   if (i>=len) {return;} /* Catch the impossible */
-
-   while(i<len){         /* Change to spaces to end of string */
-      *(c+i)=' ';
-      i++;
-   }
-
-}
 
 /* Source function to deliver the text lines to AST */
 /* The source is an AV*. Returns NULL when no more lines */
@@ -3377,18 +3327,24 @@ cmp_get1c(loc, name, elx, value, el, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   ndfint i;
+  HDSLoc * loc_c = 0;
+  char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char );
-  cmp_get1c_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
+  Newx( pntrs, elx, char* );
+
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpGet1C(loc_c, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
+
   /* Check status */
   if (status == SAI__OK) {
     /* Write to perl character array */
     for (i = 0; i<el; i++) {
-      stringf77toC(value+i*FCHAR,FCHAR);
-      av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+      av_store( (AV*) SvRV(ST(3)), i, newSVpv(pntrs[i], strlen(pntrs[i])));
     }
   }
   Safefree(value); /* Hose */
+  Safefree(pntrs);
  OUTPUT:
   status
   el
@@ -3463,18 +3419,24 @@ cmp_getvc(loc, name, elx, value, el, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   ndfint i;
+  HDSLoc * loc_c = 0;
+  char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char);
-  cmp_getvc_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
+  Newx( pntrs, elx, char* );
+
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpGetVC(loc_c, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
+
   /* Check status */
   if (status == SAI__OK) {
     /* Write to perl character array */
     for (i = 0; i<el; i++) {
-      stringf77toC(value+i*FCHAR,FCHAR);
-      av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+      av_store( (AV*) SvRV(ST(3)), i, newSVpv(pntrs[i], strlen(pntrs[i])));
     }
   }
   Safefree(value); /* Hose */
+  Safefree(pntrs);
  OUTPUT:
   status
   el
