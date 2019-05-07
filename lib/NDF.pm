@@ -61,10 +61,10 @@ $VERSION = '1.52';
                           /],
                 #ADAM only: err_clear err_start err_stop
 
-                'hds'=>[qw/hds_copy hds_erase hds_ewild hds_flush hds_free
+                'hds'=>[qw/hds_copy hds_erase hds_flush hds_free
                            hds_group hds_gtune hds_link hds_lock hds_new
                            hds_open hds_show hds_state hds_stop hds_trace
-                           hds_tune hds_wild
+                           hds_tune
                           /],
 
                 'dat'=>[qw/dat_alter dat_annul dat_basic dat_ccopy dat_cctyp
@@ -1236,10 +1236,10 @@ err_level err_load err_mark err_rep err_rlse err_stat err_syser
 
 =item :hds
 
-All hds_ routines are implemented:
-hds_copy hds_erase hds_ewild hds_flush hds_free hds_group hds_gtune
+All hds_ routines except hds_ewild and hds_wild are implemented:
+hds_copy hds_erase hds_flush hds_free hds_group hds_gtune
 hds_link hds_lock hds_new hds_open hds_show hds_state hds_stop
-hds_trace hds_tune hds_wild
+hds_trace hds_tune
 
 =item :dat
 

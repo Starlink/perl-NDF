@@ -3843,17 +3843,6 @@ hds_erase(loc, status)
   status
 
 void
-hds_ewild(iwld, status)
-  ndfint &iwld
-  ndfint &status
- PROTOTYPE: $$
- CODE:
-  hds_ewild_(&iwld, &status);
- OUTPUT:
-  iwld
-  status
-
-void
 hds_flush(group, status)
   char * group
   ndfint &status
@@ -4022,24 +4011,6 @@ hds_tune(param, value, status)
   hds_tune_(param, &value, &status, strlen(param));
  OUTPUT:
   status
-
-void
-hds_wild(fspec, mode, iwld, loc, status)
-  char * fspec
-  char * mode
-  ndfint &iwld
-  locator * loc = NO_INIT
-  ndfint &status
- PROTOTYPE: $$$
- PREINIT:
-  locator floc[DAT__SZLOC];
- CODE:
-  loc = floc;
-  hds_wild_(fspec, mode, &iwld, loc, &status, strlen(fspec), strlen(mode), DAT__SZLOC);
- OUTPUT:
-  loc
-  status
-
 
 
 ###############  A R Y ###############
