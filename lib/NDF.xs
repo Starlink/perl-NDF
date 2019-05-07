@@ -3229,20 +3229,6 @@ dat_vec(loc1, loc2, status)
   loc2
   status
 
-void
-dat_where(loc, block, offset, status)
-  locator * loc
-  ndfint &block = NO_INIT
-  ndfint &offset = NO_INIT
-  ndfint &status
- PROTOTYPE: $$$$
- CODE:
-  dat_where_(loc, &block, &offset, &status, DAT__SZLOC);
- OUTPUT:
-  block
-  offset
-  status
-
 
 ##############  C M P ######################
 

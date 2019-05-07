@@ -85,7 +85,7 @@ $VERSION = '1.52';
                            dat_putvr dat_ref dat_refct dat_renam dat_reset
                            dat_retyp dat_shape dat_size dat_slice dat_state
                            dat_struc dat_temp dat_there dat_type dat_unmap
-                           dat_valid dat_vec dat_where
+                           dat_valid dat_vec
                           /],
 
                 'cmp'=>[qw/ cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r
@@ -1255,7 +1255,7 @@ dat_put0c dat_put0d dat_put0i dat_put0l dat_put0r dat_put1c dat_put1d
 dat_put1i dat_put1r dat_putd dat_puti dat_putr dat_putvc dat_putvd
 dat_putvi dat_putvr dat_ref dat_refct dat_renam dat_reset dat_retyp
 dat_shape dat_size dat_slice dat_state dat_struc dat_temp dat_there
-dat_type dat_unmap dat_valid dat_vec dat_where
+dat_type dat_unmap dat_valid dat_vec
 
 
 =item :cmp
