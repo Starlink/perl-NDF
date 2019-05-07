@@ -54,6 +54,7 @@ extern "C" {
 #include "ems_err.h"
 #include "msg_par.h"
 #include "ndf.h"
+#include "ary_types.h"
 
 /* Include BAD values */
 #include "prm_par.h"
@@ -1214,13 +1215,13 @@ ndf_sqmf(qmf, indf, status)
 
 void
 ndf_ssary(iary1, indf, iary2, status)
-  ndfint &iary1
+  Ary* &iary1
   ndfint &indf
-  ndfint &iary2 = NO_INIT
+  Ary* &iary2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_ssary_(&iary1, &indf, &iary2, &status);
+  ndfSsary_(iary1, indf, &iary2, &status);
  OUTPUT:
   iary2
   status
@@ -1569,11 +1570,11 @@ ndf_xiary(indf, xname, cmpt, mode, iary, status)
   char * xname
   char * cmpt
   char * mode
-  ndfint &iary = NO_INIT
+  Ary* &iary = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
-  ndf_xiary_(&indf, xname, cmpt, mode, &iary, &status, strlen(xname), strlen(cmpt), strlen(mode));
+  ndfXiary_(indf, xname, cmpt, mode, &iary, &status);
  OUTPUT:
   iary
   status
@@ -4060,23 +4061,23 @@ hds_wild(fspec, mode, iwld, loc, status)
 
 void
 ary_annul(iary, status)
-  ndfint &iary
+  Ary* &iary
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ary_annul_(&iary, &status);
+  aryAnnul(&iary, &status);
 
 void
 ary_dim(iary, ndimx, dim, ndim, status)
-  ndfint &iary
+  Ary* &iary
   ndfint &ndimx
-  ndfint * dim = NO_INIT
+  hdsdim * dim = NO_INIT
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$@$$
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
-  ary_dim_(&iary, &ndimx, dim, &ndim, &status);
+  aryDim(iary, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
@@ -4088,26 +4089,32 @@ void
 ary_find(loc, name, iary, status)
   locator * loc
   char * name
-  ndfint &iary
+  Ary* &iary
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
  CODE:
-  ary_find_(loc, name, &iary, &status, DAT__SZLOC, strlen(name));
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  aryFind(loc_c, name, &iary, &status);
  OUTPUT:
   iary
   status
 
 void
 ary_map(iary, type, mmod, pntr, el, status)
-  ndfint &iary
+  Ary* &iary
   char * type
   char * mmod
   ndfint &pntr = NO_INIT
-  ndfint &el = NO_INIT
+  size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$
+ PREINIT:
+  void *pntr_c = 0;
  CODE:
-  ary_map_(&iary,type, mmod, &pntr, &el, &status, strlen(type), strlen(mmod));
+  aryMap(iary, type, mmod, &pntr_c, &el, &status);
+  pntr = PTR2IV(pntr_c);
  OUTPUT:
   pntr
   el
@@ -4115,35 +4122,35 @@ ary_map(iary, type, mmod, pntr, el, status)
 
 void
 ary_ndim(iary, ndim, status)
-  ndfint &iary
+  Ary* &iary
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ary_ndim_(&iary, &ndim, &status);
+  aryNdim(iary, &ndim, &status);
  OUTPUT:
   ndim
   status
 
 void
 ary_size(iary, npix, status)
-  ndfint &iary
-  ndfint &npix = NO_INIT
+  Ary* &iary
+  size_t &npix = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ary_size_(&iary, &npix, &status);
+  arySize(iary, &npix, &status);
  OUTPUT:
   npix
   status
 
 void
 ary_unmap(iary, status)
-  ndfint &iary
+  Ary* &iary
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ary_unmap_(&iary, &status);
+  aryUnmap(iary, &status);
  OUTPUT:
   status
 

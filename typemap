@@ -7,8 +7,10 @@ locator *       T_LOCP
 ndfdouble *     T_DOUBLEP
 ndfint          T_IV
 ndfdouble       T_DOUBLE
+hdsdim *        T_INTP
 int *           T_INTP
 NdgProvenance * T_PTROBJ
+Ary*            T_PTROBJ
 
 INPUT
 
