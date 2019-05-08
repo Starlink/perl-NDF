@@ -141,6 +141,27 @@ static locator datroot[DAT__SZLOC]  = DAT__ROOT;
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
 
+/* Define a typemap helper function to input a list of strings
+ * as a const char **. */
+typedef const char constchar;
+
+constchar ** XS_unpack_constcharPtrPtr(SV* arg) {
+  AV* avref;
+  SV** elem;
+  constchar** array;
+  int len, i;
+
+  avref = (AV*) SvRV(arg);
+  len = av_len(avref) + 1;
+  array = get_mortalspace((len + 1) * sizeof(*array), 'u');
+  for (i = 0; i < len; i ++) {
+    elem = av_fetch(avref, i, 0);
+    array[i] = SvPV_nolen(*elem);
+  }
+  array[len] = 0;
+
+  return array;
+}
 
 /* Source function to deliver the text lines to AST */
 /* The source is an AV*. Returns NULL when no more lines */
@@ -1839,13 +1860,12 @@ ndf_hpurg(indf, irec1, irec2, status)
   status
 
 void
-ndf_hput_r(hmode, appn, repl, nlines, chrsz, text, trans, wrap, rjust, indf, status)
+ndf_hput(hmode, appn, repl, nlines, text, trans, wrap, rjust, indf, status)
   char * hmode
   char * appn
   Logical &repl
   ndfint &nlines
-  ndfint chrsz
-  char * text
+  constchar ** text
   Logical &trans
   Logical &wrap
   Logical &rjust
@@ -1853,7 +1873,7 @@ ndf_hput_r(hmode, appn, repl, nlines, chrsz, text, trans, wrap, rjust, indf, sta
   ndfint &status
  PROTOTYPE: $$$$$$$$$$$
  CODE:
-  ndf_hput_(hmode, appn, &repl, &nlines, text, &trans, &wrap, &rjust, &indf, &status, strlen(hmode), strlen(appn), chrsz);
+  ndfHput(hmode, appn, repl, nlines, (char * const *) text, trans, wrap, rjust, indf, &status);
  OUTPUT:
   status
 
@@ -2803,16 +2823,48 @@ dat_prmry(set, loc, prmry, status)
   status
 
 void
-dat_putc_r(loc, ndim, dim, chrsz, value, status)
+dat_putc(loc, ndim, dim, value, status)
   locator * loc
   ndfint &ndim
-  ndfint * dim
-  ndfint chrsz
-  char * value
+  hdsdim * dim
+  constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$$
+ PROTOTYPE: $$$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
+  size_t i;
+  size_t len = 0;
+  size_t chrsz = 1;
+  char* buff = 0;
+  char* p;
+  size_t i_sz;
  CODE:
-  dat_putc_(loc, &ndim, dim, value, &status, DAT__SZLOC, chrsz);
+  /* The datPutC function takes a single character array containing
+   * concatenated fixed length strings.  However to preserve the previous
+   * behavior of the Perl interface for now, accept an array of separate
+   * strings and convert to the concatenated form. */
+  for (i = 0; value[i]; i ++) {
+    len ++;
+    i_sz = strlen(value[i]);
+    if (i_sz > chrsz) {
+        chrsz = i_sz;
+    }
+  }
+  Newx(buff, len * chrsz, char);
+  p = buff;
+  for (i = 0; i < len; i ++) {
+    i_sz = strlen(value[i]);
+    strncpy(p, value[i], chrsz);
+    if (i_sz < chrsz) {
+        memset(p + i_sz, ' ', chrsz - i_sz);
+    }
+    p += chrsz;
+  }
+
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datPutC(loc_c, ndim, dim, buff, chrsz, &status);
+
+  Safefree(buff);
  OUTPUT:
   status
 
@@ -2911,15 +2963,17 @@ dat_put0r(loc, value, status)
   status
 
 void
-dat_put1c_r(loc, el, chrsz, value, status)
+dat_put1c(loc, el, value, status)
   locator * loc
   ndfint &el
-  ndfint chrsz
-  char * value
+  constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
  CODE:
-  dat_put1c_(loc, &el, value, &status, DAT__SZLOC, chrsz);
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datPut1C(loc_c, el, value, &status);
  OUTPUT:
   status
 
@@ -2960,15 +3014,17 @@ dat_put1r(loc, el, value, status)
   status
 
 void
-dat_putvc_r(loc, el, chrsz, value, status)
+dat_putvc(loc, el, value, status)
   locator * loc
   ndfint &el
-  ndfint chrsz
-  char * value
+  constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
  CODE:
-  dat_putvc_(loc, &el, value, &status, DAT__SZLOC, chrsz);
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  datPutVC(loc_c, el, value, &status);
  OUTPUT:
   status
 
@@ -3621,16 +3677,18 @@ cmp_put0r(loc, name, value, status)
   status
 
 void
-cmp_put1c_r(loc, name, el, chrsz, value, status)
+cmp_put1c(loc, name, el, value, status)
   locator * loc
   char * name
   ndfint &el
-  ndfint chrsz
-  char * value
+  constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
  CODE:
-  cmp_put1c_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name), chrsz);
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpPut1C(loc_c, name, el, value, &status);
  OUTPUT:
   status
 
@@ -3691,16 +3749,18 @@ cmp_putni(loc, name, ndim, dimx, value, dim, status)
   status
 
 void
-cmp_putvc_r(loc, name, el, chrsz, value, status)
+cmp_putvc(loc, name, el, value, status)
   locator * loc
   char * name
   ndfint &el
-  ndfint chrsz
-  char * value
+  constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  HDSLoc * loc_c = 0;
  CODE:
-  cmp_putvc_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name), chrsz);
+  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
+  cmpPutVC(loc_c, name, el, value, &status);
  OUTPUT:
   status
 

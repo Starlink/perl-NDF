@@ -11,6 +11,7 @@ hdsdim *        T_INTP
 int *           T_INTP
 NdgProvenance * T_PTROBJ
 Ary*            T_PTROBJ
+constchar **    T_PACKEDARRAY
 
 INPUT
 
