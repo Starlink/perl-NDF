@@ -3,7 +3,6 @@ ndfint *	T_INTP
 ndffloat	T_NV
 ndffloat *	T_FLOATP
 Logical	        T_IV
-locator *       T_LOCP
 ndfdouble *     T_DOUBLEP
 ndfint          T_IV
 ndfdouble       T_DOUBLE
@@ -16,8 +15,6 @@ constchar **    T_PACKEDARRAY
 
 INPUT
 
-T_LOCP
-	$var = (char *)SvPV($arg, datszloc)
 T_INTP
         $var = ($type)pack1D($arg,'i')
 T_FLOATP
@@ -45,6 +42,3 @@ T_DOUBLEP
         sv_setpv((SV*)$arg, (char *)$var);
 T_PTROBJ_NULLABLE
         sv_setiv(newSVrv($arg, \"${ntype}\"), PTR2IV((void*)$var));
-
-T_LOCP
-        sv_setpvn((SV*)$arg, (char *)$var, datszloc);

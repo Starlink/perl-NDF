@@ -125,19 +125,6 @@ typedef I32 Logical;
 #define PACKF   'f'
 #define PACKD   'd'
 
-/* Set up some new variable types for using HDS locators */
-/* Now define the locator type */
-
-typedef char locator;
-
-
-
-
-/* Need to define variables for these CPP parameters
-   as they are used in the typemaps */
-static STRLEN  datszloc = DAT__SZLOC;
-static locator datroot[DAT__SZLOC]  = DAT__ROOT;
-
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
 
@@ -862,16 +849,12 @@ void
 ndf_loc(indf, mode, loc, status)
   ndfint &indf
   char * mode
-  locator * loc = NO_INIT
+  HDSLoc * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  loc = floc;
-  ndfLoc(indf, mode, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  loc = 0;
+  ndfLoc(indf, mode, &loc, &status);
  OUTPUT:
   loc
   status
@@ -1608,16 +1591,12 @@ ndf_xloc(indf, xname, mode, xloc, status)
   ndfint &indf
   char * xname
   char * mode
-  locator * xloc = NO_INIT
+  HDSLoc * xloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  xloc = floc;
-  ndfXloc(indf, xname, mode, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  xloc = 0;
+  ndfXloc(indf, xname, mode, &xloc, &status);
  OUTPUT:
   xloc
   status
@@ -1645,16 +1624,12 @@ ndf_xnew(indf, xname, type, ndim, dim, loc, status)
   char * type
   ndfint &ndim
   hdsdim * dim
-  locator * loc = NO_INIT
+  HDSLoc * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$\@$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  loc = floc;
-  ndfXnew(indf, xname, type, ndim, dim, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  loc = 0;
+  ndfXnew(indf, xname, type, ndim, dim, &loc, &status);
  OUTPUT:
   loc
   status
@@ -1972,36 +1947,30 @@ ndfPtwcs_(wcsarr, indf, status)
 
 void
 dat_alter(loc, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datAlter(loc_c, ndim, dim, &status);
+  datAlter(loc, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 dat_annul(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datAnnul(&loc_c, &status);
+  datAnnul(&loc, &status);
  OUTPUT:
   status
 
 
 void
 dat_basic(loc, mode, pntr, len, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &pntr = NO_INIT
   size_t &len = NO_INIT
@@ -2009,10 +1978,8 @@ dat_basic(loc, mode, pntr, len, status)
  PROTOTYPE: $$$$$
  PREINIT:
   unsigned char* pntr_c = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datBasic(loc_c, mode, &pntr_c, &len, &status);
+  datBasic(loc, mode, &pntr_c, &len, &status);
   pntr = cnfFptr(pntr_c);
  OUTPUT:
   pntr
@@ -2021,23 +1988,15 @@ dat_basic(loc, mode, pntr, len, status)
 
 void
 dat_ccopy(loc1, loc2, name, loc3, status)
-  locator * loc1
-  locator * loc2
+  HDSLoc * loc1
+  HDSLoc * loc2
   char * name
-  locator * loc3 = NO_INIT
+  HDSLoc * loc3 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
-  HDSLoc * loc3_c = 0;
  CODE:
-  loc3 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datImportFloc(loc2, DAT__SZLOC, &loc2_c, &status);
-  datCcopy(loc1_c, loc2_c, name, &loc3_c, &status);
-  datExportFloc(&loc3_c, 0, DAT__SZLOC, floc, &status);
+  loc3 = 0;
+  datCcopy(loc1, loc2, name, &loc3, &status);
  OUTPUT:
   loc3
   status
@@ -2057,108 +2016,79 @@ dat_cctyp(size, type)
 
 void
 dat_cell(loc1, ndim, sub, loc2, status)
-  locator * loc1
+  HDSLoc * loc1
   ndfint &ndim
   hdsdim * sub
-  locator * loc2 = NO_INIT
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datCell(loc1_c, ndim, sub, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datCell(loc1, ndim, sub, &loc2, &status);
  OUTPUT:
   loc2
   status
 
 void
 dat_clen(loc, clen, status)
-  locator * loc
+  HDSLoc * loc
   size_t &clen = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datClen(loc_c, &clen, &status);
+  datClen(loc, &clen, &status);
  OUTPUT:
   clen
   status
 
 void
 dat_clone(loc1, loc2, status)
-  locator * loc1
-  locator * loc2 = NO_INIT
+  HDSLoc * loc1
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datClone(loc1_c, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datClone(loc1, &loc2, &status);
  OUTPUT:
   loc2
   status
 
 void
 dat_coerc(loc1, ndim, loc2, status)
-  locator * loc1
+  HDSLoc * loc1
   ndfint &ndim
-  locator * loc2 = NO_INIT
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datCoerc(loc1_c, ndim, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datCoerc(loc1, ndim, &loc2, &status);
  OUTPUT:
   loc2
   status
 
 void
 dat_copy(loc1, loc2, name, status)
-  locator * loc1
-  locator * loc2
+  HDSLoc * loc1
+  HDSLoc * loc2
   char * name
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datImportFloc(loc2, DAT__SZLOC, &loc2_c, &status);
-  datCopy(loc1_c, loc2_c, name, &status);
+  datCopy(loc1, loc2, name, &status);
  OUTPUT:
   status
 
 void
 dat_drep(loc, format, order, status)
-  locator * loc
+  HDSLoc * loc
   char * format = NO_INIT
   char * order = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datDrep(loc_c, &format, &order, &status);
+  datDrep(loc, &format, &order, &status);
  OUTPUT:
   format
   order
@@ -2167,15 +2097,12 @@ dat_drep(loc, format, order, status)
 
 void
 dat_erase(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datErase(loc_c, name, &status);
+  datErase(loc, name, &status);
  OUTPUT:
   status
 
@@ -2196,37 +2123,29 @@ dat_ermsg(status, length, msg)
 
 void
 dat_find(inloc, name, outloc, status)
-  locator * inloc
+  HDSLoc * inloc
   char * name
-  locator * outloc = NO_INIT
+  HDSLoc * outloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * inloc_c = 0;
-  HDSLoc * outloc_c = 0;
  CODE:
-  outloc = floc;
-  datImportFloc(inloc, DAT__SZLOC, &inloc_c, &status);
-  datFind(inloc_c, name, &outloc_c, &status);
-  datExportFloc(&outloc_c, 0, DAT__SZLOC, floc, &status);
+  outloc = 0;
+  datFind(inloc, name, &outloc, &status);
  OUTPUT:
   outloc
   status
 
 void
 dat_get0c(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   char * value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
    char str1[FCHAR];
-   HDSLoc * loc_c = 0;
  CODE:
   value = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet0C(loc_c, value, sizeof(str1), &status);
+  datGet0C(loc, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
@@ -2234,67 +2153,55 @@ dat_get0c(loc, value, status)
 
 void
 dat_get0d(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfdouble &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet0D(loc_c, &value, &status);
+  datGet0D(loc, &value, &status);
  OUTPUT:
   value
   status
 
 void
 dat_get0i(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet0I(loc_c, &value, &status);
+  datGet0I(loc, &value, &status);
  OUTPUT:
   value
   status
 
 void
 dat_get0l(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   Logical &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet0L(loc_c, &value, &status);
+  datGet0L(loc, &value, &status);
  OUTPUT:
   value
   status
 
 void
 dat_get0r(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndffloat &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet0R(loc_c, &value, &status);
+  datGet0R(loc, &value, &status);
  OUTPUT:
   value
   status
 
 void
 dat_get1c(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &elx
   char * value = NO_INIT
   size_t &el = NO_INIT
@@ -2302,14 +2209,12 @@ dat_get1c(loc, elx, value, el, status)
  PROTOTYPE: $$\@$$
  PREINIT:
   ndfint i;
-  HDSLoc * loc_c = 0;
   char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char);
   Newx( pntrs, elx, char* );
 
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet1C(loc_c, elx, (elx * FCHAR), value, pntrs, &el, &status);
+  datGet1C(loc, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
@@ -2326,18 +2231,15 @@ dat_get1c(loc, elx, value, el, status)
 
 void
 dat_get1d(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndfdouble * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKD);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet1D(loc_c, elx, value, &el, &status);
+  datGet1D(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
@@ -2347,18 +2249,15 @@ dat_get1d(loc, elx, value, el, status)
 
 void
 dat_get1i(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndfint * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet1I(loc_c, elx, value, &el, &status);
+  datGet1I(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
@@ -2368,18 +2267,15 @@ dat_get1i(loc, elx, value, el, status)
 
 void
 dat_get1r(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndffloat * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKF);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGet1R(loc_c, elx, value, &el, &status);
+  datGet1R(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
@@ -2389,7 +2285,7 @@ dat_get1r(loc, elx, value, el, status)
 
 void
 dat_getvc(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &elx
   char * value = NO_INIT
   size_t &el = NO_INIT
@@ -2397,14 +2293,12 @@ dat_getvc(loc, elx, value, el, status)
  PROTOTYPE: $$\@$$
  PREINIT:
   ndfint i;
-  HDSLoc * loc_c = 0;
   char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char );
   Newx( pntrs, elx, char* );
 
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGetVC(loc_c, elx, (elx * FCHAR), value, pntrs, &el, &status);
+  datGetVC(loc, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
@@ -2421,18 +2315,15 @@ dat_getvc(loc, elx, value, el, status)
 
 void
 dat_getvd(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndfdouble * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKD);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGetVD(loc_c, elx, value, &el, &status);
+  datGetVD(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
@@ -2442,18 +2333,15 @@ dat_getvd(loc, elx, value, el, status)
 
 void
 dat_getvi(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndfint * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGetVI(loc_c, elx, value, &el, &status);
+  datGetVI(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
@@ -2463,18 +2351,15 @@ dat_getvi(loc, elx, value, el, status)
 
 void
 dat_getvr(loc, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   size_t &elx
   ndffloat * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKF);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datGetVR(loc_c, elx, value, &el, &status);
+  datGetVR(loc, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
@@ -2484,35 +2369,26 @@ dat_getvr(loc, elx, value, el, status)
 
 void
 dat_index(loc, index, nloc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &index
-  locator * nloc = NO_INIT
+  HDSLoc * nloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-   HDSLoc * loc_c = 0;
-   HDSLoc * nloc_c = 0;
  CODE:
-  nloc = floc;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datIndex(loc_c, index, &nloc_c, &status);
-  datExportFloc(&nloc_c, 0, DAT__SZLOC, floc, &status);
+  nloc = 0;
+  datIndex(loc, index, &nloc, &status);
  OUTPUT:
   nloc
   status
 
 void
 dat_len(loc, len, status)
-  locator * loc
+  HDSLoc * loc
   size_t &len = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datLen(loc_c, &len, &status);
+  datLen(loc, &len, &status);
  OUTPUT:
   len
   status
@@ -2521,7 +2397,7 @@ dat_len(loc, len, status)
 
 void
 dat_map(loc, type, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * type
   char * mode
   ndfint &ndim
@@ -2531,10 +2407,8 @@ dat_map(loc, type, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$$\@$$
  PREINIT:
   void *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMap(loc_c, type, mode, ndim, dim, &pntr, &status);
+  datMap(loc, type, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2542,7 +2416,7 @@ dat_map(loc, type, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapc(loc, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &ndim
   hdsdim * dim
@@ -2551,10 +2425,8 @@ dat_mapc(loc, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   unsigned char *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapC(loc_c, mode, ndim, dim, &pntr, &status);
+  datMapC(loc, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2562,7 +2434,7 @@ dat_mapc(loc, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapd(loc, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &ndim
   hdsdim * dim
@@ -2571,10 +2443,8 @@ dat_mapd(loc, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   double *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapD(loc_c, mode, ndim, dim, &pntr, &status);
+  datMapD(loc, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2582,7 +2452,7 @@ dat_mapd(loc, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapi(loc, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &ndim
   hdsdim * dim
@@ -2591,10 +2461,8 @@ dat_mapi(loc, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   int *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapI(loc_c, mode, ndim, dim, &pntr, &status);
+  datMapI(loc, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2602,7 +2470,7 @@ dat_mapi(loc, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapl(loc, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &ndim
   hdsdim * dim
@@ -2611,10 +2479,8 @@ dat_mapl(loc, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   hdsbool_t *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapL(loc_c, mode, ndim, dim, &pntr, &status);
+  datMapL(loc, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2622,7 +2488,7 @@ dat_mapl(loc, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapr(loc, mode, ndim, dim, cpntr, status)
-  locator * loc
+  HDSLoc * loc
   char * mode
   ndfint &ndim
   hdsdim * dim
@@ -2631,10 +2497,8 @@ dat_mapr(loc, mode, ndim, dim, cpntr, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   float *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapR(loc_c, mode, ndim, dim, &pntr, &status);
+  datMapR(loc, mode, ndim, dim, &pntr, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2642,7 +2506,7 @@ dat_mapr(loc, mode, ndim, dim, cpntr, status)
 
 void
 dat_mapv(loc, type, mode, cpntr, el, status)
-  locator * loc
+  HDSLoc * loc
   char * type
   char * mode
   IV &cpntr = NO_INIT
@@ -2651,10 +2515,8 @@ dat_mapv(loc, type, mode, cpntr, el, status)
  PROTOTYPE: $$$$$$
  PREINIT:
   void *pntr = 0;
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMapV(loc_c, type, mode, &pntr, &el, &status);
+  datMapV(loc, type, mode, &pntr, &el, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -2663,76 +2525,59 @@ dat_mapv(loc, type, mode, cpntr, el, status)
 
 void
 dat_mould(loc, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMould(loc_c, ndim, dim, &status);
+  datMould(loc, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 dat_move(loc1, loc2, name, status)
-  locator * loc1
-  locator * loc2
+  HDSLoc * loc1
+  HDSLoc * loc2
   char * name
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datImportFloc(loc2, DAT__SZLOC, &loc2_c, &status);
-  datMove(&loc1_c, loc2_c, name, &status);
+  datMove(&loc1, loc2, name, &status);
  OUTPUT:
   status
 
 void
 dat_msg(token, loc)
   char * token
-  locator * loc
+  HDSLoc * loc
  PROTOTYPE: $$
- PREINIT:
-  HDSLoc * loc_c = 0;
-  int status = SAI__OK; /* for datImportFloc */
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datMsg(token, loc_c);
+  datMsg(token, loc);
 
 void
 dat_name(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
    char str1[DAT__SZNAM+1];
-   HDSLoc * loc_c = 0;
  CODE:
   name = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datName(loc_c, name, &status);
+  datName(loc, name, &status);
  OUTPUT:
   name
   status
 
 void
 dat_ncomp(loc, ncomp, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ncomp = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNcomp(loc_c, &ncomp, &status);
+  datNcomp(loc, &ncomp, &status);
  OUTPUT:
   ncomp
   status
@@ -2740,230 +2585,182 @@ dat_ncomp(loc, ncomp, status)
 
 void
 dat_new(loc, name, type, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * type
   ndfint &ndim
   hdsdim * dim
   ndfint &status
   PROTOTYPE: $$$$\@$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew(loc_c, name, type, ndim, dim, &status);
+  datNew(loc, name, type, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 dat_new0d(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew0D(loc_c, name, &status);
+  datNew0D(loc, name, &status);
  OUTPUT:
   status
 
 void
 dat_new0i(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew0I(loc_c, name, &status);
+  datNew0I(loc, name, &status);
  OUTPUT:
   status
 
 void
 dat_new0l(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew0L(loc_c, name, &status);
+  datNew0L(loc, name, &status);
  OUTPUT:
   status
 
 void
 dat_new0r(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew0R(loc_c, name, &status);
+  datNew0R(loc, name, &status);
  OUTPUT:
   status
 
 void
 dat_new0c(loc, name, len, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &len
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew0C(loc_c, name, len, &status);
+  datNew0C(loc, name, len, &status);
  OUTPUT:
   status
 
 void
 dat_new1d(loc, name, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &el
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew1D(loc_c, name, el, &status);
+  datNew1D(loc, name, el, &status);
  OUTPUT:
   status
 
 void
 dat_new1i(loc, name, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew1I(loc_c, name, el, &status);
+  datNew1I(loc, name, el, &status);
  OUTPUT:
   status
 
 void
 dat_new1l(loc, name, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &el
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew1L(loc_c, name, el, &status);
+  datNew1L(loc, name, el, &status);
  OUTPUT:
   status
 
 void
 dat_new1r(loc, name, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &el
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew1R(loc_c, name, el, &status);
+  datNew1R(loc, name, el, &status);
  OUTPUT:
   status
 
 void
 dat_new1c(loc, name, len, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &len
   size_t &el
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNew1C(loc_c, name, len, el, &status);
+  datNew1C(loc, name, len, el, &status);
  OUTPUT:
   status
 
 void
 dat_newc(loc, name, len, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &len
   ndfint &ndim
   hdsdim * dim
   ndfint &status
   PROTOTYPE: $$$$\@$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datNewC(loc_c, name, len, ndim, dim, &status);
+  datNewC(loc, name, len, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 dat_paren(loc1, loc2, status)
-  locator * loc1
-  locator * loc2 = NO_INIT
+  HDSLoc * loc1
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datParen(loc1_c, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datParen(loc1, &loc2, &status);
  OUTPUT:
   loc2
   status
 
 void
 dat_prec(loc, nbyte, status)
-  locator * loc
+  HDSLoc * loc
   size_t &nbyte = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPrec(loc_c, &nbyte, &status);
+  datPrec(loc, &nbyte, &status);
  OUTPUT:
   nbyte
   status
 
 void
 dat_prim(loc, reply, status)
-  locator * loc
+  HDSLoc * loc
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPrim(loc_c, &reply, &status);
+  datPrim(loc, &reply, &status);
  OUTPUT:
   reply
   status
@@ -2971,18 +2768,12 @@ dat_prim(loc, reply, status)
 void
 dat_prmry(set, loc, prmry, status)
   Logical &set
-  locator * loc
+  HDSLoc * loc
   Logical &prmry
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
-  locator floc[DAT__SZLOC];
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPrmry(set, &loc_c, &prmry, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
-  loc = floc;
+  datPrmry(set, &loc, &prmry, &status);
  OUTPUT:
   loc
   prmry
@@ -2990,14 +2781,13 @@ dat_prmry(set, loc, prmry, status)
 
 void
 dat_putc(loc, ndim, dim, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
  PREINIT:
-  HDSLoc * loc_c = 0;
   size_t i;
   size_t len = 0;
   size_t chrsz = 1;
@@ -3027,8 +2817,7 @@ dat_putc(loc, ndim, dim, value, status)
     p += chrsz;
   }
 
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutC(loc_c, ndim, dim, buff, chrsz, &status);
+  datPutC(loc, ndim, dim, buff, chrsz, &status);
 
   Safefree(buff);
  OUTPUT:
@@ -3036,256 +2825,206 @@ dat_putc(loc, ndim, dim, value, status)
 
 void
 dat_putd(loc, ndim, dim, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   ndfdouble * value
   ndfint &status
  PROTOTYPE: $$\@\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutD(loc_c, ndim, dim, value, &status);
+  datPutD(loc, ndim, dim, value, &status);
  OUTPUT:
   status
 
 void
 dat_puti(loc, ndim, dim, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   ndfint * value
   ndfint &status
  PROTOTYPE: $$\@\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutI(loc_c, ndim, dim, value, &status);
+  datPutI(loc, ndim, dim, value, &status);
  OUTPUT:
   status
 
 void
 dat_putr(loc, ndim, dim, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndim
   hdsdim * dim
   ndffloat * value
   ndfint &status
  PROTOTYPE: $$\@\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutR(loc_c, ndim, dim, value, &status);
+  datPutR(loc, ndim, dim, value, &status);
  OUTPUT:
   status
 
 void
 dat_put0c(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   char * value
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut0C(loc_c, value, &status);
+  datPut0C(loc, value, &status);
  OUTPUT:
   status
 
 void
 dat_put0d(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfdouble &value
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut0D(loc_c, value, &status);
+  datPut0D(loc, value, &status);
  OUTPUT:
   status
 
 void
 dat_put0i(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &value
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut0I(loc_c, value, &status);
+  datPut0I(loc, value, &status);
  OUTPUT:
   status
 
 void
 dat_put0l(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   Logical &value
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut0L(loc_c, value, &status);
+  datPut0L(loc, value, &status);
  OUTPUT:
   status
 
 void
 dat_put0r(loc, value, status)
-  locator * loc
+  HDSLoc * loc
   ndffloat &value
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut0R(loc_c, value, &status);
+  datPut0R(loc, value, &status);
  OUTPUT:
   status
 
 void
 dat_put1c(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &el
   constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut1C(loc_c, el, value, &status);
+  datPut1C(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_put1d(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   size_t &el
   ndfdouble * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut1D(loc_c, el, value, &status);
+  datPut1D(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_put1i(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   size_t &el
   ndfint * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut1I(loc_c, el, value, &status);
+  datPut1I(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_put1r(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   size_t &el
   ndffloat * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPut1R(loc_c, el, value, &status);
+  datPut1R(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_putvc(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &el
   constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutVC(loc_c, el, value, &status);
+  datPutVC(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_putvd(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   size_t &el
   ndfdouble * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutVD(loc_c, el, value, &status);
+  datPutVD(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_putvi(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &el
   ndfint * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutVI(loc_c, el, value, &status);
+  datPutVI(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_putvr(loc, el, value, status)
-  locator * loc
+  HDSLoc * loc
   size_t &el
   ndffloat * value
   ndfint &status
  PROTOTYPE: $$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datPutVR(loc_c, el, value, &status);
+  datPutVR(loc, el, value, &status);
  OUTPUT:
   status
 
 void
 dat_ref(loc, ref, lref, status)
-  locator * loc
+  HDSLoc * loc
   char * ref = NO_INIT
   ndfint &lref = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
    char str1[FCHAR];
-   HDSLoc * loc_c = 0;
  CODE:
   ref = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datRef(loc_c, ref, sizeof(str1), &status);
+  datRef(loc, ref, sizeof(str1), &status);
   lref = strlen(ref);
  OUTPUT:
   ref
@@ -3294,74 +3033,59 @@ dat_ref(loc, ref, lref, status)
 
 void
 dat_refct(loc, refct, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &refct = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datRefct(loc_c, &refct, &status);
+  datRefct(loc, &refct, &status);
  OUTPUT:
   refct
   status
 
 void
 dat_renam(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datRenam(loc_c, name, &status);
+  datRenam(loc, name, &status);
  OUTPUT:
   status
 
 void
 dat_reset(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datReset(loc_c, &status);
+  datReset(loc, &status);
  OUTPUT:
   status
 
 void
 dat_retyp(loc, type, status)
-  locator * loc
+  HDSLoc * loc
   char * type
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datRetyp(loc_c, type, &status);
+  datRetyp(loc, type, &status);
  OUTPUT:
   status
 
 void
 dat_shape(loc, ndimx, dim, ndim, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &ndimx
   hdsdim * dim = NO_INIT
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datShape(loc_c, ndimx, dim, &ndim, &status);
+  datShape(loc, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
@@ -3371,67 +3095,52 @@ dat_shape(loc, ndimx, dim, ndim, status)
 
 void
 dat_size(loc, size, status)
-  locator * loc
+  HDSLoc * loc
   size_t &size = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datSize(loc_c, &size, &status);
+  datSize(loc, &size, &status);
  OUTPUT:
   size
   status
 
 void
 dat_slice(loc1, ndim, diml, dimu, loc2, status)
-  locator * loc1
+  HDSLoc * loc1
   ndfint ndim
   hdsdim * diml
   hdsdim * dimu
-  locator * loc2 = NO_INIT
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@\@$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datSlice(loc1_c, ndim, diml, dimu, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datSlice(loc1, ndim, diml, dimu, &loc2, &status);
  OUTPUT:
   loc2
   status
 
 void
 dat_state(loc, reply, status)
-  locator * loc
+  HDSLoc * loc
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datState(loc_c, &reply, &status);
+  datState(loc, &reply, &status);
  OUTPUT:
   reply
   status
 
 void
 dat_struc(loc, reply, status)
-  locator * loc
+  HDSLoc * loc
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datStruc(loc_c, &reply, &status);
+  datStruc(loc, &reply, &status);
  OUTPUT:
   reply
   status
@@ -3441,49 +3150,40 @@ dat_temp(type, ndim, dim, loc, status)
   char * type
   ndfint &ndim
   hdsdim * dim
-  locator * loc = NO_INIT
+  HDSLoc * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  loc = floc;
-  datTemp(type, ndim, dim, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  loc = 0;
+  datTemp(type, ndim, dim, &loc, &status);
  OUTPUT:
   loc
   status
 
 void
 dat_there(loc, name, reply, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datThere(loc_c, name, &reply, &status);
+  datThere(loc, name, &reply, &status);
  OUTPUT:
   reply
   status
 
 void
 dat_type(loc, type, status)
-  locator * loc
+  HDSLoc * loc
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
    char str1[DAT__SZTYP+1];
-   HDSLoc * loc_c = 0;
  CODE:
   type = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datType(loc_c, type, &status);
+  datType(loc, type, &status);
  OUTPUT:
   type
   status
@@ -3491,47 +3191,35 @@ dat_type(loc, type, status)
 
 void
 dat_unmap(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datUnmap(loc_c, &status);
+  datUnmap(loc, &status);
  OUTPUT:
   status
 
 void
 dat_valid(loc, reply, status)
-  locator * loc
+  HDSLoc * loc
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  datValid(loc_c, &reply, &status);
+  datValid(loc, &reply, &status);
  OUTPUT:
   reply
   status
 
 void
 dat_vec(loc1, loc2, status)
-  locator * loc1
-  locator * loc2 = NO_INIT
+  HDSLoc * loc1
+  HDSLoc * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc1_c = 0;
-  HDSLoc * loc2_c = 0;
  CODE:
-  loc2 = floc;
-  datImportFloc(loc1, DAT__SZLOC, &loc1_c, &status);
-  datVec(loc1_c, &loc2_c, &status);
-  datExportFloc(&loc2_c, 0, DAT__SZLOC, floc, &status);
+  loc2 = 0;
+  datVec(loc1, &loc2, &status);
  OUTPUT:
   loc2
   status
@@ -3541,82 +3229,68 @@ dat_vec(loc1, loc2, status)
 
 void
 cmp_get0c(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
    char str1[FCHAR];
-   HDSLoc * loc_c = 0;
  CODE:
   value = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet0C(loc_c, name, value, sizeof(str1), &status);
+  cmpGet0C(loc, name, value, sizeof(str1), &status);
  OUTPUT:
   value
   status
 
 void
 cmp_get0d(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfdouble &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet0D(loc_c, name, &value, &status);
+  cmpGet0D(loc, name, &value, &status);
  OUTPUT:
   value
   status
 
 void
 cmp_get0i(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet0I(loc_c, name, &value, &status);
+  cmpGet0I(loc, name, &value, &status);
  OUTPUT:
   value
   status
 
 void
 cmp_get0l(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Logical &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet0L(loc_c, name, &value, &status);
+  cmpGet0L(loc, name, &value, &status);
  OUTPUT:
   value
   status
 
 void
 cmp_get0r(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndffloat &value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet0R(loc_c, name, &value, &status);
+  cmpGet0R(loc, name, &value, &status);
  OUTPUT:
   value
   status
@@ -3624,7 +3298,7 @@ cmp_get0r(loc, name, value, status)
 
 void
 cmp_get1c(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &elx
   char * value = NO_INIT
@@ -3633,14 +3307,12 @@ cmp_get1c(loc, name, elx, value, el, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   ndfint i;
-  HDSLoc * loc_c = 0;
   char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char );
   Newx( pntrs, elx, char* );
 
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet1C(loc_c, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
+  cmpGet1C(loc, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
@@ -3657,19 +3329,16 @@ cmp_get1c(loc, name, elx, value, el, status)
 
 void
 cmp_get1d(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndfdouble * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKD);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet1D(loc_c, name, elx, value, &el, &status);
+  cmpGet1D(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
@@ -3679,19 +3348,16 @@ cmp_get1d(loc, name, elx, value, el, status)
 
 void
 cmp_get1i(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndfint * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet1I(loc_c, name, elx, value, &el, &status);
+  cmpGet1I(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
@@ -3701,19 +3367,16 @@ cmp_get1i(loc, name, elx, value, el, status)
 
 void
 cmp_get1r(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndffloat * value = NO_INIT
   size_t  &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKF);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGet1R(loc_c, name, elx, value, &el, &status);
+  cmpGet1R(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKF, el);
@@ -3725,7 +3388,7 @@ cmp_get1r(loc, name, elx, value, el, status)
 
 void
 cmp_getvc(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &elx
   char * value = NO_INIT
@@ -3734,14 +3397,12 @@ cmp_getvc(loc, name, elx, value, el, status)
  PROTOTYPE: $$$\@$$
  PREINIT:
   ndfint i;
-  HDSLoc * loc_c = 0;
   char** pntrs;
  CODE:
   Newx( value, elx * FCHAR, char);
   Newx( pntrs, elx, char* );
 
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGetVC(loc_c, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
+  cmpGetVC(loc, name, elx, (elx * FCHAR), value, pntrs, &el, &status);
 
   /* Check status */
   if (status == SAI__OK) {
@@ -3758,19 +3419,16 @@ cmp_getvc(loc, name, elx, value, el, status)
 
 void
 cmp_getvd(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndfdouble * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKD);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGetVD(loc_c, name, elx, value, &el, &status);
+  cmpGetVD(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
@@ -3780,19 +3438,16 @@ cmp_getvd(loc, name, elx, value, el, status)
 
 void
 cmp_getvi(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndfint * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGetVI(loc_c, name, elx, value, &el, &status);
+  cmpGetVI(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
@@ -3802,19 +3457,16 @@ cmp_getvi(loc, name, elx, value, el, status)
 
 void
 cmp_getvr(loc, name, elx, value, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &elx
   ndffloat * value = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
   value = get_mortalspace(elx, 'r');
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpGetVR(loc_c, name, elx, value, &el, &status);
+  cmpGetVR(loc, name, elx, value, &el, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)value, 'r', el);
@@ -3825,23 +3477,20 @@ cmp_getvr(loc, name, elx, value, el, status)
 
 void
 cmp_len(loc, name, len, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &len = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpLen(loc_c, name, &len, &status);
+  cmpLen(loc, name, &len, &status);
  OUTPUT:
   len
   status
 
 void
 cmp_mapv(loc, name, type, mode, cpntr, el, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * type
   char * mode
@@ -3850,11 +3499,9 @@ cmp_mapv(loc, name, type, mode, cpntr, el, status)
   ndfint &status
  PROTOTYPE: $$$$$$$
  PREINIT:
-  HDSLoc * loc_c = 0;
   void *pntr = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpMapV(loc_c, name, type, mode, &pntr, &el, &status);
+  cmpMapV(loc, name, type, mode, &pntr, &el, &status);
   cpntr = PTR2IV( pntr );
  OUTPUT:
   cpntr
@@ -3863,191 +3510,155 @@ cmp_mapv(loc, name, type, mode, cpntr, el, status)
 
 void
 cmp_mod(loc, name, type, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * type
   ndfint &ndim
   hdsdim * dim
   ndfint &status
  PROTOTYPE: $$$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpMod(loc_c, name, type, ndim, dim, &status);
+  cmpMod(loc, name, type, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 cmp_modc(loc, name, len, ndim, dim, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &len
   ndfint &ndim
   hdsdim * dim
   ndfint &status
  PROTOTYPE: $$$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpModC(loc_c, name, len, ndim, dim, &status);
+  cmpModC(loc, name, len, ndim, dim, &status);
  OUTPUT:
   status
 
 void
 cmp_prim(loc, name, reply, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPrim(loc_c, name, &reply, &status);
+  cmpPrim(loc, name, &reply, &status);
  OUTPUT:
   reply
   status
 
 void
 cmp_put0c(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * value
   ndfint &status
   PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut0C(loc_c, name, value, &status);
+  cmpPut0C(loc, name, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put0d(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfdouble &value
   ndfint &status
   PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut0D(loc_c, name, value, &status);
+  cmpPut0D(loc, name, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put0i(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &value
   ndfint &status
   PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut0I(loc_c, name, value, &status);
+  cmpPut0I(loc, name, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put0l(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Logical &value
   ndfint &status
   PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut0L(loc_c, name, value, &status);
+  cmpPut0L(loc, name, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put0r(loc, name, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndffloat &value
   ndfint &status
   PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut0R(loc_c, name, value, &status);
+  cmpPut0R(loc, name, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put1c(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut1C(loc_c, name, el, value, &status);
+  cmpPut1C(loc, name, el, value, &status);
  OUTPUT:
   status
 
 
 void
 cmp_put1d(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndfdouble * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut1D(loc_c, name, el, value, &status);
+  cmpPut1D(loc, name, el, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put1i(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndfint * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut1I(loc_c, name, el, value, &status);
+  cmpPut1I(loc, name, el, value, &status);
  OUTPUT:
   status
 
 void
 cmp_put1r(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndffloat * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPut1R(loc_c, name, el, value, &status);
+  cmpPut1R(loc, name, el, value, &status);
  OUTPUT:
   status
 
@@ -4070,84 +3681,69 @@ cmp_put1r(loc, name, el, value, status)
 
 void
 cmp_putvc(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   constchar ** value
   ndfint &status
  PROTOTYPE: $$$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPutVC(loc_c, name, el, value, &status);
+  cmpPutVC(loc, name, el, value, &status);
  OUTPUT:
   status
 
 
 void
 cmp_putvd(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndfdouble * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPutVD(loc_c, name, el, value, &status);
+  cmpPutVD(loc, name, el, value, &status);
  OUTPUT:
   status
 
 void
 cmp_putvi(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndfint * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPutVI(loc_c, name, el, value, &status);
+  cmpPutVI(loc, name, el, value, &status);
  OUTPUT:
   status
 
 void
 cmp_putvr(loc, name, el, value, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &el
   ndffloat * value
   ndfint &status
   PROTOTYPE: $$$\@$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpPutVR(loc_c, name, el, value, &status);
+  cmpPutVR(loc, name, el, value, &status);
  OUTPUT:
   status
 
 void
 cmp_shape(loc, name, ndimx, dim, ndim, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &ndimx
   hdsdim * dim = NO_INIT
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpShape(loc_c, name, ndimx, dim, &ndim, &status);
+  cmpShape(loc, name, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
@@ -4157,65 +3753,54 @@ cmp_shape(loc, name, ndimx, dim, ndim, status)
 
 void
 cmp_size(loc, name, size, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   size_t &size = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpSize(loc_c, name, &size, &status);
+  cmpSize(loc, name, &size, &status);
  OUTPUT:
   size
   status
 
 void
 cmp_struc(loc, name, reply, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Logical &reply = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpStruc(loc_c, name, &reply, &status);
+  cmpStruc(loc, name, &reply, &status);
  OUTPUT:
   reply
   status
 
 void
 cmp_type(loc, name, type, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
    char str1[DAT__SZTYP + 1];
-   HDSLoc * loc_c = 0;
  CODE:
   type = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpType(loc_c, name, str1, &status);
+  cmpType(loc, name, str1, &status);
  OUTPUT:
   type
   status
 
 void
 cmp_unmap(loc, name, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  cmpUnmap(loc_c, name, &status);
+  cmpUnmap(loc, name, &status);
  OUTPUT:
   status
 
@@ -4223,29 +3808,23 @@ cmp_unmap(loc, name, status)
 
 void
 hds_copy(loc, file, name, status)
-  locator * loc
+  HDSLoc * loc
   char * file
   char * name
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsCopy(loc_c, file, name, &status);
+  hdsCopy(loc, file, name, &status);
  OUTPUT:
   status
 
 void
 hds_erase(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsErase(&loc_c, &status);
+  hdsErase(&loc, &status);
  OUTPUT:
   status
 
@@ -4261,30 +3840,25 @@ hds_flush(group, status)
 
 void
 hds_free(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsFree(loc_c, &status);
+  hdsFree(loc, &status);
  OUTPUT:
   status
 
 void
 hds_group(loc, group, status)
-  locator * loc
+  HDSLoc * loc
   char * group = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  PREINIT:
    char str1[DAT__SZGRP + 1];
-   HDSLoc * loc_c = 0;
  CODE:
   group = str1;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsGroup(loc_c, group, &status);
+  hdsGroup(loc, group, &status);
  OUTPUT:
   group
   status
@@ -4303,28 +3877,22 @@ hds_gtune(param, value, status)
 
 void
 hds_link(loc, group, status)
-  locator * loc
+  HDSLoc * loc
   char * group
   ndfint &status
  PROTOTYPE: $$$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsLink(loc_c, group, &status);
+  hdsLink(loc, group, &status);
  OUTPUT:
   status
 
 void
 hds_lock(loc, status)
-  locator * loc
+  HDSLoc * loc
   ndfint &status
  PROTOTYPE: $$
- PREINIT:
-   HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsLock(loc_c, &status);
+  hdsLock(loc, &status);
  OUTPUT:
   status
 
@@ -4336,16 +3904,12 @@ hds_new(file, name, type, ndim, dim, loc, status)
   char * type
   ndfint &ndim
   hdsdim * dim
-  locator * loc = NO_INIT
+  HDSLoc * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$\@$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  loc = floc;
-  hdsNew(file, name, type, ndim, dim, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  loc = 0;
+  hdsNew(file, name, type, ndim, dim, &loc, &status);
  OUTPUT:
   loc
   status
@@ -4355,16 +3919,12 @@ void
 hds_open(file, mode, loc, status)
   char * file
   char * mode
-  locator * loc = NO_INIT
+  HDSLoc * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
-  HDSLoc * loc_c = 0;
  CODE:
-  loc = floc;
-  hdsOpen(file, mode, &loc_c, &status);
-  datExportFloc(&loc_c, 0, DAT__SZLOC, floc, &status);
+  loc = 0;
+  hdsOpen(file, mode, &loc, &status);
  OUTPUT:
   loc
   status
@@ -4400,7 +3960,7 @@ hds_stop(status)
 
 void
 hds_trace(loc, nlev, path, file, status)
-  locator * loc
+  HDSLoc * loc
   ndfint & nlev = NO_INIT
   char * path = NO_INIT
   char * file = NO_INIT
@@ -4409,12 +3969,10 @@ hds_trace(loc, nlev, path, file, status)
  PREINIT:
    char str1[FCHAR];
    char str2[FCHAR];
-   HDSLoc * loc_c = 0;
  CODE:
   path = str1;
   file = str2;
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  hdsTrace(loc_c, &nlev, path, file, &status, sizeof(str1), sizeof(str2));
+  hdsTrace(loc, &nlev, path, file, &status, sizeof(str1), sizeof(str2));
  OUTPUT:
   nlev
   path
@@ -4464,16 +4022,13 @@ ary_dim(iary, ndimx, dim, ndim, status)
 
 void
 ary_find(loc, name, iary, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   Ary* &iary
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  aryFind(loc_c, name, &iary, &status);
+  aryFind(loc, name, &iary, &status);
  OUTPUT:
   iary
   status
