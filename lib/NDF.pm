@@ -94,7 +94,7 @@ $VERSION = '1.52';
                             cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d
                             cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d
                             cmp_put1i cmp_put1r
-                            cmp_putni cmp_putvc cmp_putvd cmp_putvi cmp_putvr
+                            cmp_putvc cmp_putvd cmp_putvi cmp_putvr
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
 
@@ -1193,7 +1193,7 @@ dat_type dat_unmap dat_valid dat_vec
 cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r cmp_get1c cmp_get1d
 cmp_get1i cmp_get1r cmp_getvc cmp_getvd cmp_getvi cmp_getvr cmp_len
 cmp_mapv cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d cmp_put0i
-cmp_put0l cmp_put0r cmp_put1c cmp_put1d cmp_put1i cmp_put1r cmp_putni
+cmp_put0l cmp_put0r cmp_put1c cmp_put1d cmp_put1i cmp_put1r
 cmp_putvc cmp_putvd cmp_putvi cmp_putvr cmp_shape cmp_size cmp_struc
 cmp_type cmp_unmap
 

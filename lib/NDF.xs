@@ -3733,20 +3733,21 @@ cmp_put1r(loc, name, el, value, status)
   status
 
 
-void
-cmp_putni(loc, name, ndim, dimx, value, dim, status)
-  locator * loc
-  char * name
-  ndfint &ndim
-  ndfint * dimx
-  ndfint * value
-  ndfint * dim
-  ndfint &status
-  PROTOTYPE: $$$\@\@\@$
- CODE:
-  cmp_putni_(loc, name, &ndim, dimx, value, dim, &status, DAT__SZLOC, strlen(name));
- OUTPUT:
-  status
+# The underlying dat_putni function is not currently available in the C interface.
+#void
+#cmp_putni(loc, name, ndim, dimx, value, dim, status)
+#  locator * loc
+#  char * name
+#  ndfint &ndim
+#  ndfint * dimx
+#  ndfint * value
+#  ndfint * dim
+#  ndfint &status
+#  PROTOTYPE: $$$\@\@\@$
+# CODE:
+#  cmp_putni_(loc, name, &ndim, dimx, value, dim, &status, DAT__SZLOC, strlen(name));
+# OUTPUT:
+#  status
 
 void
 cmp_putvc(loc, name, el, value, status)
