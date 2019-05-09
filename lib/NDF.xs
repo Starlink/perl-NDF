@@ -267,21 +267,19 @@ INCLUDE: ../const-xs.inc
 
 # Locator constants
 
-locator *
+HDSLoc *
 DAT__ROOT()
  PROTOTYPE:
  CODE:
-  /* DAT__ROOT will be the correct length for the Fortran side */
-  RETVAL = (locator *)DAT__ROOT;
+  RETVAL = 0;
  OUTPUT:
   RETVAL
 
-locator *
+HDSLoc *
 DAT__NOLOC()
  PROTOTYPE:
  CODE:
-  /* C Locator will be large enough to hold Fortran version */
-  RETVAL = (locator *)DAT__NOLOC;
+  RETVAL = 0;
  OUTPUT:
   RETVAL
 
@@ -1296,18 +1294,13 @@ ndf_type(indf, comp, type, status)
 
 void
 ndf_find(loc, name, indf, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint  &indf = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  if (strncmp(DAT__ROOT, loc, DAT__SZLOC)) {
-    datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  }
-  ndfFind(loc_c, name, &indf, &status);
+  ndfFind(loc, name, &indf, &status);
  OUTPUT:
   indf
   status
@@ -1315,7 +1308,7 @@ ndf_find(loc, name, indf, status)
 
 void
 ndf_open(loc, name, mode, stat, indf, place, status)
-  locator * 	loc
+  HDSLoc * 	loc
   char * 	name
   char * 	mode
   char * 	stat
@@ -1323,13 +1316,8 @@ ndf_open(loc, name, mode, stat, indf, place, status)
   ndfint 	&place = NO_INIT
   ndfint 	&status
  PROTOTYPE: $$$$$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  if (strncmp(DAT__ROOT, loc, DAT__SZLOC)) {
-    datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  }
-  ndfOpen(loc_c, name, mode, stat, &indf, &place, &status);
+  ndfOpen(loc, name, mode, stat, &indf, &place, &status);
  OUTPUT:
   indf
   place
@@ -1469,18 +1457,13 @@ ndf_msg(token, indf)
 
 void
 ndf_place(loc, name, place, status)
-  locator * loc
+  HDSLoc * loc
   char * name
   ndfint &place = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
- PREINIT:
-  HDSLoc * loc_c = 0;
  CODE:
-  if (strncmp(DAT__ROOT, loc, DAT__SZLOC)) {
-    datImportFloc(loc, DAT__SZLOC, &loc_c, &status);
-  }
-  ndfPlace(loc_c, name, &place, &status);
+  ndfPlace(loc, name, &place, &status);
  OUTPUT:
   place
   status

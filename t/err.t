@@ -38,7 +38,7 @@ is($status, $good, "Check status");
 # Test  generates an error from NDF - so that status is bad
 
 err_mark();
-ndf_find('junk_loc', 'test', $indf, $status);
+ndf_find(&NDF::DAT__ROOT, 'nonexistentfile', $indf, $status);
 err_level( my $lev);
 is($lev,3, "Check level");
 err_rlse();

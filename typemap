@@ -9,6 +9,7 @@ ndfint          T_IV
 ndfdouble       T_DOUBLE
 hdsdim *        T_INTP
 int *           T_INTP
+HDSLoc *        T_PTROBJ_NULLABLE
 NdgProvenance * T_PTROBJ
 Ary*            T_PTROBJ
 constchar **    T_PACKEDARRAY
@@ -23,6 +24,16 @@ T_FLOATP
         $var = ($type)pack1D($arg,'f')
 T_DOUBLEP
         $var = ($type)pack1D($arg,'d')
+T_PTROBJ_NULLABLE
+        if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else {
+            Perl_croak_nocontext(\"%s: %s is not of type %s\",
+                ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                \"$var\", \"$ntype\");
+        }
 
 OUTPUT
 
@@ -32,6 +43,8 @@ T_FLOATP
         sv_setpv((SV*)$arg, (char *)$var);
 T_DOUBLEP
         sv_setpv((SV*)$arg, (char *)$var);
+T_PTROBJ_NULLABLE
+        sv_setiv(newSVrv($arg, \"${ntype}\"), PTR2IV((void*)$var));
 
 T_LOCP
         sv_setpvn((SV*)$arg, (char *)$var, datszloc);
