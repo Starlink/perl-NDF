@@ -341,11 +341,11 @@ ndf_aclen(indf, comp, iaxis, length, status)
   ndfint &indf
   char * comp
   ndfint &iaxis
-  ndfint length = NO_INIT
+  size_t length = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-   ndf_aclen_(&indf, comp, &iaxis, &length, &status, strlen(comp));
+   ndfAclen(indf, comp, iaxis, &length, &status);
  OUTPUT:
    length
    status
@@ -359,7 +359,7 @@ ndf_acmsg(token, indf, comp, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_acmsg_(token, &indf, comp, &iaxis, &status, strlen(token), strlen(comp));
+  ndfAcmsg(token, indf, comp, iaxis, &status);
  OUTPUT:
   status
 
@@ -372,7 +372,7 @@ ndf_acput(value, indf, comp, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_acput_(value, &indf, comp, &iaxis, &status, strlen(value), strlen(comp));
+  ndfAcput(value, indf, comp, iaxis, &status);
  OUTPUT:
   status
 
@@ -382,7 +382,7 @@ ndf_acre(indf, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_acre_(&indf, &status);
+  ndfAcre(indf, &status);
  OUTPUT:
   status
 
@@ -434,7 +434,7 @@ ndf_anorm(indf, iaxis, norm, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_anorm_(&indf, &iaxis, &norm, &status);
+  ndfAnorm(indf, iaxis, &norm, &status);
  OUTPUT:
   norm
   status
@@ -447,7 +447,7 @@ ndf_arest(indf, comp, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_arest_(&indf, comp, &iaxis, &status, strlen(comp));
+  ndfArest(indf, comp, iaxis, &status);
  OUTPUT:
   status
 
@@ -459,7 +459,7 @@ ndf_asnrm(norm, indf, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_asnrm_(&norm, &indf, &iaxis, &status);
+  ndfAsnrm(norm, indf, iaxis, &status);
  OUTPUT:
   status
 
@@ -485,7 +485,7 @@ ndf_astat(indf, comp, iaxis, state, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_astat_(&indf, comp, &iaxis, &state, &status, strlen(comp));
+  ndfAstat(indf, comp, iaxis, &state, &status);
  OUTPUT:
   state
   status
@@ -499,7 +499,7 @@ ndf_astyp(type, indf, comp, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_astyp_(type, &indf, comp, &iaxis, &status, strlen(type), strlen(comp));
+  ndfAstyp(type, indf, comp, iaxis, &status);
  OUTPUT:
   status
 
@@ -528,7 +528,7 @@ ndf_aunmp(indf, comp, iaxis, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-   ndf_aunmp_(&indf, comp, &iaxis, &status, strlen(comp));
+   ndfAunmp(indf, comp, iaxis, &status);
  OUTPUT:
    status
 
@@ -541,7 +541,7 @@ ndf_bad(indf, comp, check, bad, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_bad_(&indf, comp, &check, &bad, &status, strlen(comp));
+  ndfBad(indf, comp, check, &bad, &status);
  OUTPUT:
   bad
   status
@@ -553,7 +553,7 @@ ndf_bb(indf, badbit, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_bb_(&indf, &badbit, &status);
+  ndfBb(indf, &badbit, &status);
  OUTPUT:
   badbit
   status
@@ -568,7 +568,7 @@ ndf_block(indf1, ndim, mxdim, iblock, indf2, status)
   ndfint &status
  PROTOTYPE: $$\@$$$
  CODE:
-  ndf_block_(&indf1, &ndim, mxdim, &iblock, &indf2, &status);
+  ndfBlock(indf1, ndim, mxdim, iblock, &indf2, &status);
  OUTPUT:
   indf2
   status
@@ -585,7 +585,7 @@ ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
  CODE:
   lbnd = get_mortalspace(ndimx, PACKI32); /* Dynamically allocate C array */
   ubnd = get_mortalspace(ndimx,PACKI32); /* Dynamically allocate C array */
-  ndf_bound_(&indf, &ndimx, lbnd, ubnd, &ndim, &status);
+  ndfBound(indf, ndimx, lbnd, ubnd, &ndim, &status);
   /* Check status */
   if (status == SAI__OK) {
     unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, ndim);
@@ -621,7 +621,7 @@ ndf_chunk(indf1, mxpix, ichunk, indf2, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_chunk_(&indf1, &mxpix, &ichunk, &indf2, &status);
+  ndfChunk(indf1, mxpix, ichunk, &indf2, &status);
  OUTPUT:
   indf2
   status
@@ -643,11 +643,11 @@ void
 ndf_clen(indf, comp, length, status)
   ndfint &indf
   char * comp
-  ndfint &length = NO_INIT
+  size_t &length = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_clen_(&indf, comp, &length, &status, strlen(comp));
+  ndfClen(indf, comp, &length, &status);
  OUTPUT:
   length
   status
@@ -660,7 +660,7 @@ ndf_cmplx(indf, comp, cmplx, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_cmplx_(&indf, comp, &cmplx, &status, strlen(comp));
+  ndfCmplx(indf, comp, &cmplx, &status);
  OUTPUT:
   cmplx
   status
@@ -673,7 +673,7 @@ ndf_copy(indf1, place, indf2, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_copy_(&indf1, &place, &indf2, &status);
+  ndfCopy(indf1, &place, &indf2, &status);
  OUTPUT:
   place
   indf2
@@ -687,7 +687,7 @@ ndf_cput(value, indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-   ndf_cput_(value, &indf, comp, &status, strlen(value), strlen(comp));
+   ndfCput(value, indf, comp, &status);
  OUTPUT:
    status
 
@@ -728,7 +728,7 @@ ndf_delet(indf, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_delet_(&indf, &status);
+  ndfDelet(&indf, &status);
  OUTPUT:
   status
 
@@ -742,7 +742,7 @@ ndf_dim(indf, ndimx, dim, ndim, status)
  PROTOTYPE: $$\@$$
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
-  ndf_dim_(&indf, &ndimx, dim, &ndim, &status);
+  ndfDim(indf, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
@@ -803,7 +803,7 @@ ndf_isacc(indf, access, isacc, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_isacc_(&indf, access, &isacc, &status, strlen(access));
+  ndfIsacc(indf, access, &isacc, &status);
  OUTPUT:
   isacc
   status
@@ -815,7 +815,7 @@ ndf_isbas(indf, isbas, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_isbas_(&indf, &isbas, &status);
+  ndfIsbas(indf, &isbas, &status);
  OUTPUT:
   isbas
   status
@@ -827,7 +827,7 @@ ndf_istmp(indf, istmp, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_istmp_(&indf, &istmp, &status);
+  ndfIstmp(indf, &istmp, &status);
  OUTPUT:
   istmp
   status
@@ -902,7 +902,7 @@ ndf_mbad(badok, indf1, indf2, comp, check, bad, status)
   ndfint &status
  PROTOTYPE: $$$$$$$
  CODE:
-  ndf_mbad_(&badok, &indf1, &indf2, comp, &check, &bad, &status, strlen(comp));
+  ndfMbad(badok, indf1, indf2, comp, check, &bad, &status);
  OUTPUT:
   bad
   status
@@ -918,7 +918,7 @@ ndf_mbadn(badok, n, ndfs, comp, check, bad, status)
   ndfint &status
  PROTOTYPE: $$\@$$$$
  CODE:
-  ndf_mbadn_(&badok, &n, ndfs, comp, &check, &bad, &status, strlen(comp));
+  ndfMbadn(badok, n, ndfs, comp, check, &bad, &status);
  OUTPUT:
   bad
   status
@@ -931,7 +931,7 @@ ndf_mbnd(option, indf1, indf2, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_mbnd_(option, &indf1, &indf2, &status, strlen(option));
+  ndfMbnd(option, &indf1, &indf2, &status);
  OUTPUT:
   indf1
   indf2
@@ -945,7 +945,7 @@ ndf_mbndn(option, n, ndfs, status)
   ndfint &status
  PROTOTYPE: $$\@$
  CODE:
-  ndf_mbndn_(option, &n, ndfs, &status, strlen(option));
+  ndfMbndn(option, n, ndfs, &status);
   if (status == SAI__OK)
     unpack1D( (SV*)ST(2), (void *)ndfs, PACKI32, n);
  OUTPUT:
@@ -1005,7 +1005,7 @@ ndf_nbloc(indf, ndim, mxdim, nblock, status)
   ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  ndf_nbloc_(&indf, &ndim, mxdim, &nblock, &status);
+  ndfNbloc(indf, ndim, mxdim, &nblock, &status);
  OUTPUT:
   nblock
   status
@@ -1018,7 +1018,7 @@ ndf_nchnk(indf, mxpix, nchunk, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_nchnk_(&indf, &mxpix, &nchunk, &status);
+  ndfNchnk(indf, mxpix, &nchunk, &status);
  OUTPUT:
   nchunk
   status
@@ -1033,7 +1033,7 @@ ndf_newp(ftype, ndim, ubnd, place, indf, status)
   ndfint &status
  PROTOTYPE: $$\@$$$
  CODE:
-  ndf_newp_(ftype, &ndim, ubnd, &place, &indf, &status, strlen(ftype));
+  ndfNewp(ftype, ndim, ubnd, &place, &indf, &status);
  OUTPUT:
   place
   indf
@@ -1046,7 +1046,7 @@ ndf_noacc(access, indf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_noacc_(access, &indf, &status, strlen(access));
+  ndfNoacc(access, indf, &status);
  OUTPUT:
   status
 
@@ -1071,7 +1071,7 @@ ndf_qmf(indf, qmf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_qmf_(&indf, &qmf, &status);
+  ndfQmf(indf, &qmf, &status);
  OUTPUT:
   qmf
   status
@@ -1083,7 +1083,7 @@ ndf_reset(indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_reset_(&indf, comp, &status, strlen(comp));
+  ndfReset(indf, comp, &status);
  OUTPUT:
   status
 
@@ -1096,7 +1096,7 @@ ndf_same(indf1, indf2, same, isect, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_same_(&indf1, &indf2, &same, &isect, &status);
+  ndfSame(indf1, indf2, &same, &isect, &status);
  OUTPUT:
   same
   isect
@@ -1110,7 +1110,7 @@ ndf_sbad(bad, indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_sbad_(&bad, &indf, comp, &status, strlen(comp));
+  ndfSbad(bad, indf, comp, &status);
  OUTPUT:
   status
 
@@ -1122,7 +1122,7 @@ ndf_sbb(badbit, indf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_sbb_(&badbit, &indf, &status);
+  ndfSbb(badbit, indf, &status);
  OUTPUT:
   status
 
@@ -1135,7 +1135,7 @@ ndf_sbnd(ndim, lbnd, ubnd, indf, status)
   ndfint &status
  PROTOTYPE: $\@\@$$
  CODE:
-  ndf_sbnd_(&ndim, lbnd, ubnd, &indf, &status);
+  ndfSbnd(ndim, lbnd, ubnd, indf, &status);
  OUTPUT:
   status
 
@@ -1148,7 +1148,7 @@ ndf_scopy(indf1, clist, place, indf2, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_scopy_(&indf1, clist, &place, &indf2, &status, strlen(clist));
+  ndfScopy(indf1, clist, &place, &indf2, &status);
  OUTPUT:
   place
   indf2
@@ -1164,7 +1164,7 @@ ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
   ndfint &status
  PROTOTYPE: $$\@\@$$
  CODE:
-  ndf_sect_(&indf1, &ndim, lbnd, ubnd, &indf2, &status);
+  ndfSect(indf1, ndim, lbnd, ubnd, &indf2, &status);
  OUTPUT:
   indf2
   status
@@ -1178,7 +1178,7 @@ ndf_shift(nshift, shift, indf, status)
   ndfint &status
  PROTOTYPE: $\@$$
  CODE:
-  ndf_shift_(&nshift, shift, &indf, &status);
+  ndfShift(nshift, shift, indf, &status);
  OUTPUT:
   status
 
@@ -1189,7 +1189,7 @@ ndf_size(indf, size, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-   ndf_size_(&indf, &size, &status);
+   ndfSize(indf, &size, &status);
  OUTPUT:
    size
    status
@@ -1202,7 +1202,7 @@ ndf_sqmf(qmf, indf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_sqmf_(&qmf, &indf, &status);
+  ndfSqmf(qmf, indf, &status);
  OUTPUT:
   status
 
@@ -1227,7 +1227,7 @@ ndf_state(indf, comp, state, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_state_(&indf, comp, &state, &status, strlen(comp));
+  ndfState(indf, comp, &state, &status);
  OUTPUT:
   state
   status
@@ -1241,7 +1241,7 @@ ndf_stype(ftype, indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_stype_(ftype, &indf, comp, &status, strlen(ftype), strlen(comp));
+  ndfStype(ftype, indf, comp, &status);
  OUTPUT:
   status
 
@@ -1332,7 +1332,7 @@ ndf_unmap(indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_unmap_(&indf, comp, &status, strlen(comp));
+  ndfUnmap(indf, comp, &status);
  OUTPUT:
   status
 
@@ -1345,7 +1345,7 @@ ndf_annul(indf, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_annul_(&indf, &status);
+  ndfAnnul(&indf, &status);
  OUTPUT:
   status
 
@@ -1356,7 +1356,7 @@ ndf_base(in_ndf, out_ndf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_base_(&in_ndf, &out_ndf, &status);
+  ndfBase(in_ndf, &out_ndf, &status);
  OUTPUT:
   out_ndf
   status
@@ -1366,7 +1366,7 @@ void
 ndf_begin()
  PROTOTYPE:
  CODE:
-  ndf_begin_();
+  ndfBegin();
 
 void
 ndf_clone(in_ndf, out_ndf, status)
@@ -1375,7 +1375,7 @@ ndf_clone(in_ndf, out_ndf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_clone_(&in_ndf, &out_ndf, &status);
+  ndfClone(in_ndf, &out_ndf, &status);
  OUTPUT:
   out_ndf
   status
@@ -1386,7 +1386,7 @@ ndf_end(status)
   ndfint &status
  PROTOTYPE: $
  CODE:
-  ndf_end_(&status);
+  ndfEnd(&status);
  OUTPUT:
   status
 
@@ -1397,7 +1397,7 @@ ndf_valid(indf, valid, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_valid_(&indf, &valid, &status);
+  ndfValid(indf, &valid, &status);
  OUTPUT:
   valid
   status
@@ -1412,7 +1412,7 @@ ndf_cmsg(token, indf, comp, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_cmsg_(token, &indf, comp, &status, strlen(token), strlen(comp));
+  ndfCmsg(token, indf, comp, &status);
  OUTPUT:
   status
 
@@ -1422,7 +1422,7 @@ ndf_msg(token, indf)
   ndfint &indf
   PROTOTYPE: $$
   CODE:
-   ndf_msg_(token, &indf, strlen(token));
+   ndfMsg(token, indf);
 
 
 # C15 - Creating placeholders (3/3)
@@ -1451,7 +1451,7 @@ ndf_new(ftype, ndim, lbnd, ubnd, place, indf, status)
   ndfint &status
  PROTOTYPE: $$\@\@$$$
  CODE:
-  ndf_new_(ftype, &ndim, lbnd, ubnd, &place, &indf, &status, strlen(ftype));
+  ndfNew(ftype, ndim, lbnd, ubnd, &place, &indf, &status);
  OUTPUT:
   indf
   status
@@ -1462,7 +1462,7 @@ ndf_temp(place, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_temp_(&place, &status);
+  ndfTemp(&place, &status);
  OUTPUT:
   place
   status
@@ -1476,7 +1476,7 @@ ndf_xdel(indf, xname, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_xdel_(&indf, xname, &status, strlen(xname));
+  ndfXdel(indf, xname, &status);
  OUTPUT:
   status
 
@@ -1508,7 +1508,7 @@ ndf_xgt0d(indf, xname, cmpt, value, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xgt0d_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
+  ndfXgt0d(indf, xname, cmpt, &value, &status);
  OUTPUT:
   value
   status
@@ -1523,7 +1523,7 @@ ndf_xgt0i(indf, xname, cmpt, value, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xgt0i_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
+  ndfXgt0i(indf, xname, cmpt, &value, &status);
  OUTPUT:
   value
   status
@@ -1537,7 +1537,7 @@ ndf_xgt0l(indf, xname, cmpt, value, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xgt0l_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
+  ndfXgt0l(indf, xname, cmpt, &value, &status);
  OUTPUT:
   value
   status
@@ -1552,7 +1552,7 @@ ndf_xgt0r(indf, xname, cmpt, value, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xgt0r_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
+  ndfXgt0r(indf, xname, cmpt, &value, &status);
  OUTPUT:
   value
   status
@@ -1630,7 +1630,7 @@ ndf_xnumb(indf, nextn, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_xnumb_(&indf, &nextn, &status);
+  ndfXnumb(indf, &nextn, &status);
  OUTPUT:
   nextn
   status
@@ -1644,7 +1644,7 @@ ndf_xpt0c(value, indf, xname, cmpt, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xpt0c_(value, &indf, xname, cmpt, &status, strlen(value), strlen(xname), strlen(cmpt));
+  ndfXpt0c(value, indf, xname, cmpt, &status);
  OUTPUT:
   status
 
@@ -1658,7 +1658,7 @@ ndf_xpt0d(value, indf, xname, cmpt, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xpt0d_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
+  ndfXpt0d(value, indf, xname, cmpt, &status);
  OUTPUT:
   status
 
@@ -1671,7 +1671,7 @@ ndf_xpt0i(value, indf, xname, cmpt, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xpt0i_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
+  ndfXpt0i(value, indf, xname, cmpt, &status);
  OUTPUT:
   status
 
@@ -1684,7 +1684,7 @@ ndf_xpt0l(value, indf, xname, cmpt, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xpt0l_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
+  ndfXpt0l(value, indf, xname, cmpt, &status);
  OUTPUT:
   status
 
@@ -1697,7 +1697,7 @@ ndf_xpt0r(value, indf, xname, cmpt, status)
   ndfint &status
  PROTOTYPE: $$$$$
  CODE:
-  ndf_xpt0r_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
+  ndfXpt0r(value, indf, xname, cmpt, &status);
  OUTPUT:
   status
 
@@ -1710,7 +1710,7 @@ ndf_xstat(indf, xname, there, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_xstat_(&indf, xname, &there, &status, strlen(xname));
+  ndfXstat(indf, xname, &there, &status);
  OUTPUT:
   there
   status
@@ -1724,7 +1724,7 @@ ndf_happn(appn, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_happn_(appn, &status, strlen(appn));
+  ndfHappn(appn, &status);
  OUTPUT:
   status
 
@@ -1735,7 +1735,7 @@ ndf_hcre(indf, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  ndf_hcre_(&indf, &status);
+  ndfHcre(indf, &status);
  OUTPUT:
   status
 
@@ -1746,7 +1746,7 @@ ndf_hdef(indf, appn, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_hdef_(&indf, appn, &status, strlen(appn));
+  ndfHdef(indf, appn, &status);
  OUTPUT:
   status
 
@@ -1755,7 +1755,7 @@ ndf_hend(status)
   ndfint &status
  PROTOTYPE: $
  CODE:
-  ndf_hend_(&status);
+  ndfHend(&status);
  OUTPUT:
   status
 
@@ -1769,7 +1769,7 @@ ndf_hfind(indf, ymdhm, sec, eq, irec, status)
   ndfint &status
   PROTOTYPE: $\@$$$$
   CODE:
-  ndf_hfind_(&indf, ymdhm, &sec, &eq, &irec, &status);
+  ndfHfind(indf, ymdhm, sec, eq, &irec, &status);
  OUTPUT:
   irec
   status
@@ -1798,7 +1798,7 @@ ndf_hnrec(indf, nrec, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_hnrec_(&indf, &nrec, &status);
+  ndfHnrec(indf, &nrec, &status);
  OUTPUT:
   nrec
   status
@@ -1810,8 +1810,7 @@ ndf_hout(indf, irec, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  extern void * ndf_hecho_(ndfint *, char *, ndfint *);
-  ndf_hout_(&indf, &irec, (void *)ndf_hecho_, &status);
+  ndfHout(indf, irec, ndfHecho, &status);
  OUTPUT:
   status
 
@@ -1823,7 +1822,7 @@ ndf_hpurg(indf, irec1, irec2, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  ndf_hpurg_(&indf, &irec1, &irec2, &status);
+  ndfHpurg(indf, irec1, irec2, &status);
  OUTPUT:
   status
 
@@ -1863,7 +1862,7 @@ ndf_hsmod(hmode, indf, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_hsmod_(hmode, &indf, &status, strlen(hmode));
+  ndfHsmod(hmode, indf, &status);
  OUTPUT:
   status
 
@@ -1876,7 +1875,7 @@ ndf_gtune(tpar, value, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_gtune_(tpar, &value, &status, strlen(tpar));
+  ndfGtune(tpar, &value, &status);
  OUTPUT:
   value
   status
@@ -1888,7 +1887,7 @@ ndf_tune(tpar, value, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndf_tune_(tpar, &value, &status, strlen(tpar));
+  ndfTune(value, tpar, &status);
  OUTPUT:
   status
 
@@ -3823,7 +3822,7 @@ hds_flush(group, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  hds_flush_(group, &status, strlen(group));
+  hdsFlush(group, &status);
  OUTPUT:
   status
 
@@ -3859,7 +3858,7 @@ hds_gtune(param, value, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  hds_gtune_(param, &value, &status, strlen(param));
+  hdsGtune(param, &value, &status);
  OUTPUT:
   value
   status
@@ -3924,18 +3923,18 @@ hds_show(topic, status)
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  hds_show_(topic, &status, strlen(topic));
+  hdsShow(topic, &status);
  OUTPUT:
   status
 
 
 void
 hds_state(state, status)
-  Logical &state
+  hdsbool_t &state = NO_INIT
   ndfint &status
  PROTOTYPE: $$
  CODE:
-  hds_state_(&state, &status);
+  hdsState(&state, &status);
  OUTPUT:
   state
   status
@@ -3945,7 +3944,7 @@ hds_stop(status)
   ndfint &status
  PROTOTYPE: $
  CODE:
-  hds_stop_(&status);
+  hdsStop(&status);
 
 void
 hds_trace(loc, nlev, path, file, status)
@@ -3975,7 +3974,7 @@ hds_tune(param, value, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  hds_tune_(param, &value, &status, strlen(param));
+  hdsTune(param, value, &status);
  OUTPUT:
   status
 

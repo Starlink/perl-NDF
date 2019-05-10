@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use warnings;
 use strict;
@@ -13,8 +13,14 @@ use_ok( "NDF" );
 my $status = &NDF::SAI__OK;
 err_begin( $status );
 
+hds_gtune('VERSION', my $version, $status);
+is( $version, 5, 'hds_gtune version');
+
 hds_tune('VERSION', 4, $status);
 is( $status, &NDF::SAI__OK, "check status on hds_tune VERSION 4");
+
+hds_gtune('VERSION', $version, $status);
+is( $version, 4, 'hds_gtune version');
 
 # Initialise the dimension array
 my @dim = (10, 20);
@@ -46,6 +52,6 @@ is( $status, &NDF::SAI__OK, "check status");
 hds_erase($loc, $status);
 is( $status, &NDF::SAI__OK, "check status");
 
-hds_tune('VERSION', 5, $status);
-is( $status, &NDF::SAI__OK, "check status on hds_tune VERSION 5");
+hds_tune('VERSION', $version, $status);
+is( $status, &NDF::SAI__OK, "check status on hds_tune");
 err_end($status);

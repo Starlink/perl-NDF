@@ -7,6 +7,7 @@ ndfdouble *     T_DOUBLEP
 ndfint          T_IV
 ndfdouble       T_DOUBLE
 hdsdim *        T_INTP
+hdsbool_t       T_IV
 int *           T_INTP
 HDSLoc *        T_PTROBJ_NULLABLE
 NdgProvenance * T_PTROBJ

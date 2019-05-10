@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 27;
+use Test::More tests => 46;
 use warnings;
 use strict;
 use Test::Number::Delta;
@@ -88,20 +88,76 @@ my @lbnd = (1);
 my @ubnd = (2);
 ndf_new( "_INTEGER", 1, @lbnd, @ubnd, $place, $cndf, $status );
 ndf_map( $cndf, "DATA", "_INTEGER", "WRITE", my $pntr, my $el, $status);
+ndf_unmap($cndf, 'DATA', $status);
+
+ndf_bad($cndf, 'DATA', 0, my $bad, $status);
+ok($bad, 'ndf_bad');
+ndf_sbad(0, $cndf, 'DATA', $status);
+ndf_bad($cndf, 'DATA', 0, $bad, $status);
+is($bad, 0, 'ndf_bad');
+
+ndf_bb($cndf, my $bb, $status);
+is($bb, 0, 'Check ndf_bb');
+ndf_sbb(10, $cndf, $status);
+ndf_bb($cndf, $bb, $status);
+is($bb, 10, 'Check ndf_bb');
+
+ndf_qmf($indf, my $qmf, $status);
+is($qmf, 1, 'ndf_qmf');
+ndf_sqmf(0, $indf, $status);
+is($status, &NDF::SAI__OK, "Check status after ndf_sqmf");
+ndf_qmf($indf, $qmf, $status);
+is($qmf, 0, 'ndf_qmf');
+
+ndf_shift(1, [1000], $cndf, $status);
+ndf_bound($cndf, 7, \@lbnd, \@ubnd, my $ndim, $status);
+is($ndim, 1, 'ndf_bound ndim');
+is_deeply(\@lbnd, [1001], 'ndf_bound lbnd');
+is_deeply(\@ubnd, [1002], 'ndf_bound ubnd');
+
 ndf_annul( $cndf, $status );
 
 dat_annul( $loca, $status );
 dat_annul( $locb, $status );
 
+# Try also using ndf_newp
+ndf_xnew($indf, 'TESTP', 'NDF', 0, [], my $locp, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_xnew");
+ndf_place($locp, '', my $placep, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_place");
+ndf_newp('_REAL', 2, [5, 5], $placep, my $indfp, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_newp");
+ndf_reset($indfp, 'DATA', $status);
+ndf_state($indfp, 'DATA', my $state, $status);
+is($state, 0, 'ndf_state');
+ndf_map($indfp, 'DATA', '_REAL', 'WRITE', $pntr, $el, $status);
+ndf_unmap($indfp, 'DATA', $status);
+ndf_state($indfp, 'DATA', $state, $status);
+is($state, 1, 'ndf_state');
+ndf_annul($indfp, $status);
+dat_annul($locp, $status);
+
 # delete the extensions
+ndf_xdel($indf, 'TESTP', $status);
+is($status, &NDF::SAI__OK, "Check status");
 ndf_xdel($indf, 'TEST', $status);
 is($status, &NDF::SAI__OK, "Check status");
 ndf_xdel($indf, 'ARY_TEST', $status);
 is($status, &NDF::SAI__OK, "Check status");
 
+# Try using ndf_noacc
+ndf_isacc($indf, 'WRITE', my $isacc, $status);
+ok($isacc, 'ndf_isacc');
+ndf_noacc('WRITE', $indf, $status);
+ndf_isacc($indf, 'WRITE', $isacc, $status);
+is($isacc, 0, 'ndf_isacc');
+
 ndf_delet($indf, $status);
 is( $status, &NDF::SAI__OK, "check status");
 ok( !-e "$file.sdf", "File no longer exists");
+
+ndf_temp(my $tempplace, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_temp");
 
 ndf_end($status);
 is($status, &NDF::SAI__OK, "Check status");
