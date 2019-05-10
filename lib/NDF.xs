@@ -943,9 +943,11 @@ ndf_mbndn(option, n, ndfs, status)
   ndfint &n
   ndfint * ndfs
   ndfint &status
- PROTOTYPE: $\@$$
+ PROTOTYPE: $$\@$
  CODE:
   ndf_mbndn_(option, &n, ndfs, &status, strlen(option));
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)ndfs, PACKI32, n);
  OUTPUT:
   ndfs
   status
