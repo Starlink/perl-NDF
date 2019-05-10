@@ -92,19 +92,6 @@ extern "C" {
 
 #define NDF__SZHIS   72
 
-/* Dummy mains required for some fortran compilers */
-
-void MAIN_ () {
-   /* Cheat to define MAIN__ symbol */
-   croak("This should never happen");
-}
-void MAIN__ () {
-   /* Cheat to define MAIN__ symbol */
-   croak("This should never happen");
-}
-
-/* Should use the C interface */
-
 /* Setup typedefs for the C to Fortran conversion */
 /* Protects against 64 bit problems */
 /* Firstly define the C -> Fortran conversion */
