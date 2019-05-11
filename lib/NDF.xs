@@ -1838,7 +1838,7 @@ ndf_hput(hmode, appn, repl, nlines, text, trans, wrap, rjust, indf, status)
   Logical &rjust
   ndfint &indf
   ndfint &status
- PROTOTYPE: $$$$$$$$$$$
+ PROTOTYPE: $$$$\@$$$$$
  CODE:
   ndfHput(hmode, appn, repl, nlines, (char * const *) text, trans, wrap, rjust, indf, &status);
  OUTPUT:
@@ -2774,7 +2774,7 @@ dat_putc(loc, ndim, dim, value, status)
   hdsdim * dim
   constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$
+ PROTOTYPE: $$\@\@$
  PREINIT:
   size_t i;
   size_t len = 0;
@@ -2911,7 +2911,7 @@ dat_put1c(loc, el, value, status)
   ndfint &el
   constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$
+ PROTOTYPE: $$\@$
  CODE:
   datPut1C(loc, el, value, &status);
  OUTPUT:
@@ -2959,7 +2959,7 @@ dat_putvc(loc, el, value, status)
   ndfint &el
   constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$
+ PROTOTYPE: $$\@$
  CODE:
   datPutVC(loc, el, value, &status);
  OUTPUT:
@@ -3604,7 +3604,7 @@ cmp_put1c(loc, name, el, value, status)
   ndfint &el
   constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$
+ PROTOTYPE: $$$\@$
  CODE:
   cmpPut1C(loc, name, el, value, &status);
  OUTPUT:
@@ -3674,7 +3674,7 @@ cmp_putvc(loc, name, el, value, status)
   ndfint &el
   constchar ** value
   ndfint &status
- PROTOTYPE: $$$$$
+ PROTOTYPE: $$$\@$
  CODE:
   cmpPutVC(loc, name, el, value, &status);
  OUTPUT:
