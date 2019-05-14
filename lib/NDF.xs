@@ -92,6 +92,8 @@ extern "C" {
 
 #define NDF__SZHIS   72
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
 /* Setup typedefs for the C to Fortran conversion */
 /* Protects against 64 bit problems */
 /* Firstly define the C -> Fortran conversion */
@@ -588,8 +590,8 @@ ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
   ndfBound(indf, ndimx, lbnd, ubnd, &ndim, &status);
   /* Check status */
   if (status == SAI__OK) {
-    unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, ndim);
-    unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, ndim);
+    unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, MIN(ndim, ndimx));
+    unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, MIN(ndim, ndimx));
   }
  OUTPUT:
   ndim
@@ -745,7 +747,7 @@ ndf_dim(indf, ndimx, dim, ndim, status)
   ndfDim(indf, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, MIN(ndim, ndimx));
  OUTPUT:
   ndim
   status
