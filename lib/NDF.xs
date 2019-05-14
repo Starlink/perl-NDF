@@ -54,6 +54,7 @@ extern "C" {
 #include "ems_err.h"
 #include "msg_par.h"
 #include "ndf.h"
+#include "star/cmp.h"
 #include "ary_types.h"
 
 /* Include BAD values */
@@ -3292,7 +3293,7 @@ cmp_get1c(loc, name, elx, value, el, status)
   char * name
   ndfint &elx
   char * value = NO_INIT
-  ndfint &el = NO_INIT
+  size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
  PREINIT:
@@ -3382,7 +3383,7 @@ cmp_getvc(loc, name, elx, value, el, status)
   char * name
   ndfint &elx
   char * value = NO_INIT
-  ndfint &el = NO_INIT
+  size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
  PREINIT:
@@ -3469,7 +3470,7 @@ void
 cmp_len(loc, name, len, status)
   HDSLoc * loc
   char * name
-  ndfint &len = NO_INIT
+  size_t &len = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
@@ -3485,7 +3486,7 @@ cmp_mapv(loc, name, type, mode, cpntr, el, status)
   char * type
   char * mode
   IV cpntr = NO_INIT
-  ndfint &el   = NO_INIT
+  size_t &el   = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$$
  PREINIT:
