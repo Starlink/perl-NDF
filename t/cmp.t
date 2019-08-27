@@ -61,11 +61,11 @@ is($vfits[128], "END", 'cmp_getvc value[128]');
 
 # Test cmpShape
 my @dim = ();
-cmp_shape($xloc, 'DATA_ARRAY', 7, \@dim, my $ndim, $status);
+cmp_shape($hdsloc, 'DATA_ARRAY', 7, \@dim, my $ndim, $status);
 is($ndim, 1, 'cmp_shape ndim');
 is($dim[0], 10, 'cmp_shape dim[0]');
 
-cmp_size($xloc, 'DATA_ARRAY', my $size, $status);
+cmp_size($hdsloc, 'DATA_ARRAY', my $size, $status);
 is($size, 10, 'cmp_size');
 
 dat_annul($moreloc, $status);
