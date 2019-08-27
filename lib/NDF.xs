@@ -1963,7 +1963,7 @@ void
 dat_basic(loc, mode, pntr, len, status)
   HDSLoc * loc
   char * mode
-  ndfint &pntr = NO_INIT
+  IV pntr = NO_INIT
   size_t &len = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
@@ -1971,7 +1971,7 @@ dat_basic(loc, mode, pntr, len, status)
   unsigned char* pntr_c = 0;
  CODE:
   datBasic(loc, mode, &pntr_c, &len, &status);
-  pntr = cnfFptr(pntr_c);
+  pntr = PTR2IV(pntr_c);
  OUTPUT:
   pntr
   len
@@ -4029,7 +4029,7 @@ ary_map(iary, type, mmod, pntr, el, status)
   Ary* &iary
   char * type
   char * mmod
-  ndfint &pntr = NO_INIT
+  IV pntr = NO_INIT
   size_t &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$
