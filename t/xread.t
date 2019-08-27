@@ -29,7 +29,7 @@ my $num = 0;
 ndf_xnumb($indf, $num, $status);
 
 is($status, &NDF::SAI__OK, "Check status");
-is($num, 3, "Check count");
+is($num, 4, "Check count");
 
 # Read in a value
 my $tcold = -1;
