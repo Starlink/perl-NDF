@@ -7,3 +7,5 @@ const-c.inc
 const-xs.inc
 MYMETA.*
 NDF-*.tar.gz
+*~
+.*.swp

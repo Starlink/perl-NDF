@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use File::Spec;
-use ExtUtils::F77;
 use ExtUtils::Constant qw/ WriteConstants /;
 use Module::Build;
 use vars qw/ %StarConfig /;
@@ -22,21 +21,6 @@ my $ndflibs = qx/ndg_link/;
 $ndflibs .= qx/ one_link/;
 
 die "No NDF libraries were found.\n This may imply that the ndf_link command is not in your path." if $ndflibs !~ /./;
-
-# Fortran libraries depends on the architecture
-# Use the ExtUtils::F77 module for this
-
-my $fortranlibs = ExtUtils::F77->runtime;
-
-# CNF libs to handle older CNF builds
-
-my $cnf_defines = '';
-my $cnfrtllibs = qx/ cnfrtl_link /;
-if (!$cnfrtllibs) {
-  $cnf_defines = "-DHAVE_OLD_CNF";
-} else {
-  $ndflibs .= " ". $cnfrtllibs;
-}
 
 WriteConstants(
                NAME => "NDF",
@@ -93,15 +77,13 @@ my $build = Module::Build->new
    build_requires => {
                       "Test::More" => 0,
                       "Test::Number::Delta" => 0,
-                      "ExtUtils::F77" => 0,
                      },
    c_source => "src",
    configure_requires => {
                           "Module::Build" => '0.20',
-                          "ExtUtils::F77" => 0,
                          },
-   extra_compiler_flags => [ "-I$StarConfig{Star_Inc}", ( $cnf_defines ? $cnf_defines : ()) ],
-   extra_linker_flags => "-L$StarConfig{Star_Lib} -Wl,-rpath,$StarConfig{Star_Lib} $ndflibs $fortranlibs",
+   extra_compiler_flags => [ "-I$StarConfig{Star_Inc}" ],
+   extra_linker_flags => "-L$StarConfig{Star_Lib} -Wl,-rpath,$StarConfig{Star_Lib} $ndflibs",
   );
 
 $build->create_build_script;

@@ -17,7 +17,7 @@ http://www.starlink.ac.uk/). It is widely used in the United Kingdom
 astronomical community (for example in the Figaro data reduction
 package).
 
-This module provides a perl interface to the Fortran NDF libraries
+This module provides a perl interface to the NDF libraries
 that are supplied with the standard Starlink software distribution.
 
 		Tim Jenness (t.jenness@jach.hawaii.edu)

@@ -61,10 +61,10 @@ $VERSION = '1.52';
                           /],
                 #ADAM only: err_clear err_start err_stop
 
-                'hds'=>[qw/hds_copy hds_erase hds_ewild hds_flush hds_free
+                'hds'=>[qw/hds_copy hds_erase hds_flush hds_free
                            hds_group hds_gtune hds_link hds_lock hds_new
                            hds_open hds_show hds_state hds_stop hds_trace
-                           hds_tune hds_wild
+                           hds_tune
                           /],
 
                 'dat'=>[qw/dat_alter dat_annul dat_basic dat_ccopy dat_cctyp
@@ -85,7 +85,7 @@ $VERSION = '1.52';
                            dat_putvr dat_ref dat_refct dat_renam dat_reset
                            dat_retyp dat_shape dat_size dat_slice dat_state
                            dat_struc dat_temp dat_there dat_type dat_unmap
-                           dat_valid dat_vec dat_where
+                           dat_valid dat_vec
                           /],
 
                 'cmp'=>[qw/ cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r
@@ -94,7 +94,7 @@ $VERSION = '1.52';
                             cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d
                             cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d
                             cmp_put1i cmp_put1r
-                            cmp_putni cmp_putvc cmp_putvd cmp_putvi cmp_putvr
+                            cmp_putvc cmp_putvd cmp_putvi cmp_putvr
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
 
@@ -127,76 +127,6 @@ sub AUTOLOAD {
 }
 
 bootstrap NDF $VERSION;
-
-# Character arrays need to be packed before being passed to C
-# The int and float arrays are dealt with automatically by KGB's arrays.c
-
-sub pack1Dchar {
-  my ($arg) = shift;
-  return $arg if ref(\$arg) eq "SCALAR"; # packed char string
-  my $array_len = $#{$arg} + 1;          # How many members in array
-  my ($maxlength, $size);
-  # Find maximum length of an array member
-  $maxlength = 0;
-  foreach (@$arg) {
-    $size = length($_);
-    $maxlength = $size if $size > $maxlength;
-  }
-
-  return ($maxlength, pack("A$maxlength" x $array_len, @$arg))
-    if ref(\$arg) eq "GLOB" ||
-      (ref($arg) eq "ARRAY" && ref(\$$arg[0]) eq "SCALAR");
-  croak "Something has gone wrong";
-}
-
-
-
-# Now deal with the calls which use character arrays
-
-sub ndf_hput ($$$$\@$$$$$) {
-  croak 'Usage: ndf_hput(hmode, appn, repl, nlines, @text, trans, wrap, rjust, indf, status)' if (scalar(@_)!=10);
-  my($hmode, $appn, $repl, $nlines, $text, $trans, $wrap, $rjust,
-     $indf, $status) = @_;
-  $nlines = ($nlines > $#{$text} + 1 ? $#{$text} + 1 : $nlines);
-  ndf_hput_r($hmode, $appn, $repl, $nlines, pack1Dchar($text), $trans,
-             $wrap, $rjust, $indf, $status);
-  $_[9] = $status;
-}
-
-sub dat_putc ($$\@\@$) {
-  croak 'Usage: dat_putc(loc, ndim, @dim, @value, status)' if (scalar(@_)!=5);
-  my ($loc, $ndim, $dim, $value, $status) = @_;
-  dat_putc_r($loc, $ndim, $dim, pack1Dchar($value), $status);
-  $_[4] = $status;
-}
-
-sub dat_put1c ($$\@$) {
-  croak 'Usage: dat_put1c(loc, el, @value, status)' if (scalar(@_)!=4);
-  my ($loc, $el, $value, $status) = @_;
-  dat_put1c_r($loc, $el, pack1Dchar($value), $status);
-  $_[3] = $status;
-}
-
-sub dat_putvc ($$\@$) {
-  croak 'Usage: dat_putvc(loc, el, @value, status)' if (scalar(@_)!=4);
-  my ($loc, $el, $value, $status) = @_;
-  dat_putvc_r($loc, $el, pack1Dchar($value), $status);
-  $_[3] = $status;
-}
-
-sub cmp_put1c ($$$\@$) {
-  croak 'Usage: cmp_putvc(loc, name, el, @value, status)' if (scalar(@_)!=5);
-  my ($loc, $name, $el, $value, $status) = @_;
-  cmp_put1c_r($loc, $name, $el, pack1Dchar($value), $status);
-  $_[4] = $status;
-}
-
-sub cmp_putvc ($$$\@$) {
-  croak 'Usage: cmp_putvc(loc, name, el, @value, status)' if (scalar(@_)!=5);
-  my ($loc, $name, $el, $value, $status) = @_;
-  cmp_putvc_r($loc, $name, $el, pack1Dchar($value), $status);
-  $_[4] = $status;
-}
 
 # Add routines which deal with bytes
 
@@ -1236,10 +1166,10 @@ err_level err_load err_mark err_rep err_rlse err_stat err_syser
 
 =item :hds
 
-All hds_ routines are implemented:
-hds_copy hds_erase hds_ewild hds_flush hds_free hds_group hds_gtune
+All hds_ routines except hds_ewild and hds_wild are implemented:
+hds_copy hds_erase hds_flush hds_free hds_group hds_gtune
 hds_link hds_lock hds_new hds_open hds_show hds_state hds_stop
-hds_trace hds_tune hds_wild
+hds_trace hds_tune
 
 =item :dat
 
@@ -1255,7 +1185,7 @@ dat_put0c dat_put0d dat_put0i dat_put0l dat_put0r dat_put1c dat_put1d
 dat_put1i dat_put1r dat_putd dat_puti dat_putr dat_putvc dat_putvd
 dat_putvi dat_putvr dat_ref dat_refct dat_renam dat_reset dat_retyp
 dat_shape dat_size dat_slice dat_state dat_struc dat_temp dat_there
-dat_type dat_unmap dat_valid dat_vec dat_where
+dat_type dat_unmap dat_valid dat_vec
 
 
 =item :cmp
@@ -1263,7 +1193,7 @@ dat_type dat_unmap dat_valid dat_vec dat_where
 cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r cmp_get1c cmp_get1d
 cmp_get1i cmp_get1r cmp_getvc cmp_getvd cmp_getvi cmp_getvr cmp_len
 cmp_mapv cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d cmp_put0i
-cmp_put0l cmp_put0r cmp_put1c cmp_put1d cmp_put1i cmp_put1r cmp_putni
+cmp_put0l cmp_put0r cmp_put1c cmp_put1d cmp_put1i cmp_put1r
 cmp_putvc cmp_putvd cmp_putvi cmp_putvr cmp_shape cmp_size cmp_struc
 cmp_type cmp_unmap
 

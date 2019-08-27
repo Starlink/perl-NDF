@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 16;
+use Test::More tests => 21;
 use strict;
 
 use_ok( "NDF" );
@@ -58,6 +58,17 @@ ndf_hout($indf, $nrec, $status);
 is( $status, &NDF::SAI__OK, "ndf_hout status");
 ndf_hinfo($indf, 'APPLICATION', $nrec, my $val, $status);
 is( $status, &NDF::SAI__OK, "ndf_hinfo status");
+is( $val, 'Perl test', "ndf_hinfo value" );
+
+ndf_hpurg($indf, 1, 1, $status);
+is( $status, &NDF::SAI__OK, "ndf_hpurg status");
+ndf_hnrec($indf, my $nrecpurg, $status);
+is( $status, &NDF::SAI__OK, "ndf_hnrec status");
+is( $nrecpurg, $nrec - 1, 'Number of records after purge');
+
+ndf_hsmod('QUIET', $indf, $status);
+is( $status, &NDF::SAI__OK, "ndf_hsmod status");
+
 ndf_delet($indf, $status);
 is( $status, &NDF::SAI__OK, "ndf_delet status");
 ok( !-e "$file.sdf", "File no longer exists");

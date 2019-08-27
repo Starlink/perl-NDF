@@ -8,7 +8,6 @@ README.linux
 README.dec_osf
 INSTALL
 ChangeLog
-src/getarg.c
 ndffitswcs
 src/README
 src/arrays.c

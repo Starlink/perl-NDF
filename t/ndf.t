@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 12;
+use Test::More tests => 26;
 use strict;
 
 use_ok("NDF");
@@ -28,6 +28,51 @@ is( $status, &NDF::SAI__OK, "check status ndf_place");
 
 ndf_new('_INTEGER', 2, \@lbnd, \@ubnd, $place, my $indf, $status);
 is( $status, &NDF::SAI__OK, "check status ndf_new");
+
+ndf_acre($indf, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_acre");
+
+ndf_acput('ELEPHANTS', $indf, 'UNITS', 1, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_acput");
+
+my $axis1_units = '';
+ndf_acget($indf, 'UNITS', 1, $axis1_units, $status);
+is( $axis1_units, 'ELEPHANTS', 'ndf_acget');
+
+my $axis1_state;
+ndf_astat($indf, 'UNITS', 1, $axis1_state, $status);
+is($axis1_state, 1, 'Axis 1 state after assignment');
+
+ndf_arest($indf, 'UNITS', 1, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_arest");
+
+ndf_astat($indf, 'UNITS', 1, $axis1_state, $status);
+is($axis1_state, 0, 'Axis 1 state after reset');
+
+my $axis1_norm = undef;
+ndf_anorm($indf, 1, $axis1_norm, $status);
+is($axis1_norm, 0, 'Check axis 1 normalization');
+
+ndf_asnrm(1, $indf, 1, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_asnrm");
+
+ndf_anorm($indf, 1, $axis1_norm, $status);
+is($axis1_norm, 1, 'Check axis 1 normalization after update');
+
+ndf_astyp('_DOUBLE', $indf, 'CENTRE', 1, $status);
+is( $status, &NDF::SAI__OK, "check status after ndf_astyp");
+
+ndf_amap($indf, 'CENTRE', 1, '_DOUBLE', 'READ', my $axpntr, my $axel, $status);
+is( $status, &NDF::SAI__OK, "check status ndf_amap");
+
+ndf_aunmp($indf, 'CENTRE', 1, $status);
+is( $status, &NDF::SAI__OK, "check status ndf_aunmp");
+
+ndf_cput('HEFFALUMPS', $indf, 'UNITS', $status);
+is( $status, &NDF::SAI__OK, "check status ndf_cput");
+my $units= '';
+ndf_cget($indf, 'UNITS', $units, $status);
+is($units, 'HEFFALUMPS', 'Check NDF units');
 
 # Map the data array
 ndf_map($indf, 'DATA', '_INTEGER', 'WRITE', my $pntr, my $el, $status);
