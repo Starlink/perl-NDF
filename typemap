@@ -6,7 +6,7 @@ Logical	        T_IV
 ndfdouble *     T_DOUBLEP
 ndfint          T_IV
 ndfdouble       T_DOUBLE
-hdsdim *        T_INTP
+hdsdim *        T_HDSDIMP
 hdsbool_t       T_IV
 int *           T_INTP
 HDSLoc *        T_PTROBJ_NULLABLE
@@ -18,6 +18,8 @@ INPUT
 
 T_INTP
         $var = ($type)pack1D($arg,'i')
+T_HDSDIMP
+        $var = ($type)pack1D($arg,'H')
 T_FLOATP
         $var = ($type)pack1D($arg,'f')
 T_DOUBLEP
@@ -36,6 +38,8 @@ T_PTROBJ_NULLABLE
 OUTPUT
 
 T_INTP
+        sv_setpv((SV*)$arg, (char *)$var);
+T_HDSDIMP
         sv_setpv((SV*)$arg, (char *)$var);
 T_FLOATP
         sv_setpv((SV*)$arg, (char *)$var);

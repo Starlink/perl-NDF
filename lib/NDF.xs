@@ -26,6 +26,7 @@ extern "C" {
 #include "ppport.h"
 
 /* C interface to NDF */
+#define NDF_I8 1
 #include "ndf.h"
 
 /* For AST object creation */
@@ -111,6 +112,7 @@ typedef I32 Logical;
 /* Just use 'i' 'f' and 'd' at the moment */
 /* Will need to change arrays.c if a system uses a 64 bit 'int' */
 
+#define PACKHDSDIM 'H'
 #define PACKI32 'i'
 #define PACKF   'f'
 #define PACKD   'd'
@@ -416,7 +418,7 @@ ndf_amap(indf, comp, iaxis, type, mmod, ivpntr, el, status)
   char * type
   char * mmod
   IV ivpntr = NO_INIT
-  ndfint &el   = NO_INIT
+  size_t &el   = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$$$
  PREINIT:
@@ -565,7 +567,7 @@ void
 ndf_block(indf1, ndim, mxdim, iblock, indf2, status)
   ndfint &indf1
   ndfint &ndim
-  ndfint * mxdim
+  hdsdim * mxdim
   ndfint &iblock
   ndfint &indf2 = NO_INIT
   ndfint &status
@@ -580,19 +582,19 @@ void
 ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
   ndfint &indf
   ndfint &ndimx
-  ndfint * lbnd = NO_INIT
-  ndfint * ubnd = NO_INIT
+  hdsdim * lbnd = NO_INIT
+  hdsdim * ubnd = NO_INIT
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@\@$$
  CODE:
-  lbnd = get_mortalspace(ndimx, PACKI32); /* Dynamically allocate C array */
-  ubnd = get_mortalspace(ndimx,PACKI32); /* Dynamically allocate C array */
+  lbnd = get_mortalspace(ndimx, PACKHDSDIM); /* Dynamically allocate C array */
+  ubnd = get_mortalspace(ndimx,PACKHDSDIM); /* Dynamically allocate C array */
   ndfBound(indf, ndimx, lbnd, ubnd, &ndim, &status);
   /* Check status */
   if (status == SAI__OK) {
-    unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, MIN(ndim, ndimx));
-    unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, MIN(ndim, ndimx));
+    unpack1D( (SV*)ST(2), (void *)lbnd, PACKHDSDIM, MIN(ndim, ndimx));
+    unpack1D( (SV*)ST(3), (void *)ubnd, PACKHDSDIM, MIN(ndim, ndimx));
   }
  OUTPUT:
   ndim
@@ -739,16 +741,16 @@ void
 ndf_dim(indf, ndimx, dim, ndim, status)
   ndfint &indf
   ndfint &ndimx
-  ndfint * dim = NO_INIT
+  hdsdim * dim = NO_INIT
   ndfint &ndim = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, PACKI32);
+  dim = get_mortalspace(ndimx, PACKHDSDIM);
   ndfDim(indf, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, MIN(ndim, ndimx));
+    unpack1D( (SV*)ST(2), (void *)dim, PACKHDSDIM, MIN(ndim, ndimx));
  OUTPUT:
   ndim
   status
@@ -853,7 +855,7 @@ void
 ndf_mapql(indf, ivpntr, el, bad, status)
   ndfint indf
   IV ivpntr = NO_INIT
-  ndfint el = NO_INIT
+  size_t el = NO_INIT
   int bad = NO_INIT
   ndfint status
  PROTOTYPE: $$$$$
@@ -878,7 +880,7 @@ ndf_mapz(indf, comp, type, mmod, ivrpntr, ivipntr, el ,status)
   char * mmod
   IV ivrpntr = NO_INIT
   IV ivipntr = NO_INIT
-  ndfint el = NO_INIT
+  size_t el = NO_INIT
   ndfint status
  PROTOTYPE: $$$$$$$$
  PREINIT:
@@ -1003,7 +1005,7 @@ void
 ndf_nbloc(indf, ndim, mxdim, nblock, status)
   ndfint &indf
   ndfint &ndim
-  ndfint * mxdim
+  hdsdim * mxdim
   ndfint &nblock = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
@@ -1030,7 +1032,7 @@ void
 ndf_newp(ftype, ndim, ubnd, place, indf, status)
   char * ftype
   ndfint &ndim
-  ndfint * ubnd
+  hdsdim * ubnd
   ndfint &place
   ndfint &indf = NO_INIT
   ndfint &status
@@ -1132,8 +1134,8 @@ ndf_sbb(badbit, indf, status)
 void
 ndf_sbnd(ndim, lbnd, ubnd, indf, status)
   ndfint &ndim
-  ndfint * lbnd
-  ndfint * ubnd
+  hdsdim * lbnd
+  hdsdim * ubnd
   ndfint &indf
   ndfint &status
  PROTOTYPE: $\@\@$$
@@ -1161,8 +1163,8 @@ void
 ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
   ndfint &indf1
   ndfint &ndim
-  ndfint * lbnd
-  ndfint * ubnd
+  hdsdim * lbnd
+  hdsdim * ubnd
   ndfint &indf2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@\@$$
@@ -1176,7 +1178,7 @@ ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
 void
 ndf_shift(nshift, shift, indf, status)
   ndfint &nshift
-  ndfint * shift
+  hdsdim * shift
   ndfint &indf
   ndfint &status
  PROTOTYPE: $\@$$
@@ -1188,7 +1190,7 @@ ndf_shift(nshift, shift, indf, status)
 void
 ndf_size(indf, size, status)
   ndfint &indf
-  ndfint &size = NO_INIT
+  size_t &size = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
  CODE:
@@ -1217,7 +1219,7 @@ ndf_ssary(iary1, indf, iary2, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndfSsary_(iary1, indf, &iary2, &status);
+  ndfSsary(iary1, indf, &iary2, &status);
  OUTPUT:
   iary2
   status
@@ -1315,7 +1317,7 @@ ndf_map(indf, comp, type, mode, ivpntr, el, status)
   char * type
   char * mode
   IV     ivpntr = NO_INIT
-  ndfint el   = NO_INIT
+  size_t el   = NO_INIT
   ndfint status
  PROTOTYPE: $$$$$$$
  PREINIT:
@@ -1447,8 +1449,8 @@ void
 ndf_new(ftype, ndim, lbnd, ubnd, place, indf, status)
   char * ftype
   ndfint &ndim
-  ndfint * lbnd
-  ndfint * ubnd
+  hdsdim * lbnd
+  hdsdim * ubnd
   ndfint &place
   ndfint &indf = NO_INIT
   ndfint &status
@@ -1570,7 +1572,7 @@ ndf_xiary(indf, xname, cmpt, mode, iary, status)
   ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
-  ndfXiary_(indf, xname, cmpt, mode, &iary, &status);
+  ndfXiary(indf, xname, cmpt, mode, &iary, &status);
  OUTPUT:
   iary
   status
@@ -3075,11 +3077,11 @@ dat_shape(loc, ndimx, dim, ndim, status)
   ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, PACKI32);
+  dim = get_mortalspace(ndimx, PACKHDSDIM);
   datShape(loc, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+    unpack1D( (SV*)ST(2), (void *)dim, PACKHDSDIM, ndim);
  OUTPUT:
   ndim
   status
@@ -3733,11 +3735,11 @@ cmp_shape(loc, name, ndimx, dim, ndim, status)
   ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, PACKI32);
+  dim = get_mortalspace(ndimx, PACKHDSDIM);
   cmpShape(loc, name, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
+    unpack1D( (SV*)ST(3), (void *)dim, PACKHDSDIM, ndim);
  OUTPUT:
   ndim
   status
@@ -4002,11 +4004,11 @@ ary_dim(iary, ndimx, dim, ndim, status)
   ndfint &status
  PROTOTYPE: $$@$$
  CODE:
-  dim = get_mortalspace(ndimx, PACKI32);
+  dim = get_mortalspace(ndimx, PACKHDSDIM);
   aryDim(iary, ndimx, dim, &ndim, &status);
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+    unpack1D( (SV*)ST(2), (void *)dim, PACKHDSDIM, ndim);
  OUTPUT:
   ndim
   status

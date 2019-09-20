@@ -25,6 +25,10 @@ Apr 97: Add support for unsigned char and shorts- timj@jach.hawaii.edu
 #include "XSUB.h"     /* XSUB include */
 
 
+/* Include hds_types.h for hdsdim typedef. */
+
+#include "star/hds_types.h"
+
 /* Functions defined in this module, see header comments on each one
    for more details:                                                  */
 
@@ -78,6 +82,7 @@ void* pack1D ( SV* arg, char packtype ) {
    double dscalar;
    short sscalar;
    unsigned char uscalar;
+   hdsdim Hscalar;
    AV* array;
    I32 i,n;
    SV* work;
@@ -89,7 +94,7 @@ void* pack1D ( SV* arg, char packtype ) {
       return (void*) SvPV(SvRV(arg), len);
 
    if (packtype!='f' && packtype!='i' && packtype!='d' && packtype!='s'
-       && packtype != 'u')
+       && packtype != 'u' && packtype != 'H')
        croak("Programming error: invalid type conversion specified to pack1D");
 
    /*
@@ -125,6 +130,11 @@ void* pack1D ( SV* arg, char packtype ) {
           uscalar = (unsigned char) SvNV(arg);	/*Get the scalar value */
 	  sv_setpvn(work, (char *) &uscalar, sizeof(char)); /* Pack it in */
       }
+      if (packtype=='H') {
+          Hscalar = (hdsdim) SvNV(arg);	/*Get the scalar value */
+	  sv_setpvn(work, (char *) &Hscalar, sizeof(hdsdim)); /* Pack it in */
+      }
+
       return (void *) SvPV(work, PL_na);        /* Return the pointer */
    }
 
@@ -150,6 +160,9 @@ void* pack1D ( SV* arg, char packtype ) {
           SvGROW( work, sizeof(short)*(n+1) );
       if (packtype=='u')
 	  SvGROW( work, sizeof(char)*(n+1) );
+      if (packtype=='H')
+	  SvGROW( work, sizeof(hdsdim)*(n+1) );
+
 
 
       /* Pack array into string */
@@ -185,6 +198,11 @@ void* pack1D ( SV* arg, char packtype ) {
 	        uscalar = (unsigned char) nval;
 	        sv_catpvn( work, (char *) &uscalar, sizeof(char));
 	    }
+	    if (packtype=='H') {
+	        Hscalar = (hdsdim) nval;
+	        sv_catpvn( work, (char *) &Hscalar, sizeof(hdsdim));
+	    }
+
       }
 
       /* Return a pointer to the byte array */
@@ -241,6 +259,7 @@ void* pack2D ( SV* arg, char packtype ) {
    short sscalar;
    double dscalar;
    unsigned char uscalar;
+   hdsdim Hscalar;
    AV* array;
    AV* array2;
    I32 i,j,n,m;
@@ -254,7 +273,7 @@ void* pack2D ( SV* arg, char packtype ) {
       return (void*) SvPV(SvRV(arg), len);
 
    if (packtype!='f' && packtype!='i' && packtype!='d' && packtype!='s'
-       && packtype!='u')
+       && packtype!='u' && packtype != 'H')
        croak("Programming error: invalid type conversion specified to pack2D");
 
    /* Is arg a scalar? Return pointer to char part */
@@ -312,6 +331,9 @@ void* pack2D ( SV* arg, char packtype ) {
                  SvGROW( work, sizeof(char)*(n+1)*(m+1) );
 	       if (packtype=='d')
 		 SvGROW( work, sizeof(double)*(n+1) );
+	       if (packtype=='H')
+		 SvGROW( work, sizeof(hdsdim)*(n+1) );
+
             }
 
             for(j=0; j<=m; j++) {  /* Loop over 2nd dimension */
@@ -346,6 +368,10 @@ void* pack2D ( SV* arg, char packtype ) {
                if (packtype=='u') {
                   uscalar = (unsigned char) nval;
                   sv_catpvn( work, (char *) &uscalar, sizeof(char));
+               }
+               if (packtype=='H') {
+                  Hscalar = (hdsdim) nval;
+                  sv_catpvn( work, (char *) &Hscalar, sizeof(hdsdim));
                }
             }
       }
@@ -395,7 +421,7 @@ void* packND ( SV* arg, char packtype ) {
       return (void*) SvPV(SvRV(arg), len);
 
    if (packtype!='f' && packtype!='i' && packtype!='d'
-       && packtype!='s' && packtype!='u')
+       && packtype!='s' && packtype!='u' && packtype != 'H')
        croak("Programming error: invalid type conversion specified to packND");
 
    /*
@@ -423,6 +449,7 @@ void pack_element(SV* work, SV** arg, char packtype) {
    float scalar;
    short sscalar;
    unsigned char uscalar;
+   hdsdim Hscalar;
    double nval;
 
    /* Pack element arg onto work recursively */
@@ -454,6 +481,10 @@ void pack_element(SV* work, SV** arg, char packtype) {
       if (packtype=='u') {
 	uscalar = (unsigned char) nval;
 	sv_catpvn(work, (char *) &uscalar, sizeof(char)); /* Pack it in */
+      }
+      if (packtype=='H') {
+	Hscalar = (hdsdim) nval;
+	sv_catpvn(work, (char *) &Hscalar, sizeof(hdsdim)); /* Pack it in */
       }
 
       return;
@@ -514,6 +545,7 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
    double* dvar;
    short* svar;
    unsigned char* uvar;
+   hdsdim* Hvar;
    double foo;
    SV* work;
    AV* array;
@@ -525,7 +557,7 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
        return;
 
    if (packtype!='f' && packtype!='i' && packtype!= 'd' &&
-       packtype!='u' && packtype!='s')
+       packtype!='u' && packtype!='s' && packtype != 'H')
        croak("Programming error: invalid type conversion specified to unpack1D");
 
    m=n;  array = coerce1D( arg, m );   /* Get array ref and coerce */
@@ -543,6 +575,9 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
      uvar = (unsigned char *) var;
    if (packtype=='s')
      svar = (short *) var;
+   if (packtype=='H')
+     Hvar = (hdsdim *) var;
+
 
    /* Unpack into the array */
 
@@ -557,6 +592,9 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
          av_store( array, i, newSViv( (IV)uvar[i] ) );
       if (packtype=='s')
          av_store( array, i, newSViv( (IV)svar[i] ) );
+      if (packtype=='H')
+         av_store( array, i, newSViv( (IV)Hvar[i] ) );
+
    }
 
    return;
@@ -622,7 +660,7 @@ void* get_mortalspace( int n, char packtype ) {
    SV* work;
 
    if (packtype!='f' && packtype!='i' && packtype!='d'
-       && packtype!='u' && packtype!='s')
+       && packtype!='u' && packtype!='s' && packtype != 'H')
      croak("Programming error: invalid type conversion specified to get_mortalspace");
 
    work = sv_2mortal(newSVpv("", 0));
@@ -637,6 +675,8 @@ void* get_mortalspace( int n, char packtype ) {
      SvGROW( work, sizeof(char)*n);
    if (packtype=='s')
      SvGROW( work, sizeof(short)*n);
+   if (packtype=='H')
+     SvGROW( work, sizeof(hdsdim)*n);
 
    return (void *) SvPV(work, PL_na);
 }
