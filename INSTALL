@@ -10,9 +10,7 @@ perl5.002.
 The Starlink NDF library distribution (version 1.3 or higher) must be
 available.  The NDF library (libndf.a) is dependent on many other
 libraries in the Starlink distribution. If you have the Starlink
-software collection all these libraries should be available, if not
-the libraries must be downloaded from the Starlink Software Store
-(http://www.starlink.ac.uk/cgi-store/storetop).
+software collection all these libraries should be available.
 
 As of 5th November 1996, the following libraries are required in order
 to use the NDF module (via the Starlink ndf_link command):
@@ -25,9 +23,9 @@ are installed.
 
 Luckily Starlink distribute ALL necessary libraries in one package if
 the NDF library is requested. Pre-built libraries can be obtained for
-Alpha/OSF1, Linux and Sun Solaris.
+Linux.
 
-If you wish to use the PDL::NDF extension you will also need PDL,
+If you wish to use the PDL::IO::NDF extension you will also need PDL,
 available from CPAN. The PDL module works with version 1.11 of Perl DL.
 
 
@@ -35,22 +33,17 @@ available from CPAN. The PDL module works with version 1.11 of Perl DL.
 Building and Installation
 -------------------------
 
-0) Read the associated machine dependent README file (README.dec_osf,
-   README.solaris or README.linux) for known problems on your 
-   architecture.
+0) Read the associated machine-dependent README file (README.linux)
+   for known problems on your architecture.
 
 1) If the optional Starlink include files are available then you may want
    to remove the comments from NDF.xs.
 
-2) Edit Makefile.PL.
-	Makefile.PL should work for Solaris 2.5, Linux ELF and Alpha
-        Digital Unix 4.0.
+2) Edit Build.PL.
+	Build.PL should work for Linux.
 
    You may need to edit the location of the Starlink include files
    if they are not in the standard location ($starinc). 
-
-   If you are installing the ndfperl binary then you may also want to
-   change $install so that it points to eg. /star/bin. 
 
 
 3) Installation should now be a case of:
@@ -74,7 +67,7 @@ To do this the following is necessary:
 	% make
 
 This will create libarrays.a. You must then uncomment the libarrays line
-in Makefile.PL and comment out the '#include "arrays/arrays.c"' line in
+in Build.PL and comment out the '#include "arrays/arrays.c"' line in
 NDF.xs.
 
 Copyright
