@@ -71,7 +71,7 @@ my $build = Module::Build->new
    version_from => $file,
    meta_merge => {
                resources =>  {
-                              repository => "git://starlink.jach.hawaii.edu/perl-NDF.git",
+                              repository => "https://github.com/Starlink/perl-NDF.git",
                              },
                 },
    build_requires => {
