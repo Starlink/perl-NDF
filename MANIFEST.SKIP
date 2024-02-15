@@ -1,1 +1,14 @@
-^MYMETA.yml$
+^MYMETA\.yml$
+^MYMETA\.json$
+^\.git
+^_build\/
+^blib\/
+^Build$
+^MANIFEST\.bak$
+\..*\.swp$
+~$
+const-c.inc
+const-xs.inc
+^NDF-
+^lib\/NDF.c$
+\.o$
